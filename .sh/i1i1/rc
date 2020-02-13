@@ -1,0 +1,81 @@
+is_installed() {
+    which $* &>/dev/null
+}
+get_os() {
+    awk -F= '/^ID=/{print $2}' /etc/os-release
+}
+install_packet() {
+    case $(get_os) in
+        arch)          sudo pacman -S --confirm $* ;;
+        debian|ubuntu) sudo apt install -y $* ;;
+    esac
+}
+install_packets() {
+    for p in $*; do
+        is_installed $p && continue
+
+        type install_$p &>/dev/null && install_$p && continue
+        install_packet $p   
+    done
+}
+install_fzf() {
+    is_installed fzf && return
+
+    case $(get_os) in
+        arch)          install_packet fzf ;;
+        debian|ubuntu)
+            (
+                cd /usr/bin/
+                curl -L https://github.com/junegunn/fzf-bin/releases/download/0.20.0/fzf-0.20.0-linux_amd64.tgz | \
+                    sudo tar -xz -f -
+            )
+            ;;
+    esac
+}
+install_ripgrep() {
+    is_installed rg && return
+
+    case $(get_os) in
+        arch)          install_packet ripgrep ;;
+        debian|ubuntu)
+            DEB=$(mktemp --suffix deb -u)
+            URL=https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
+            curl -o $DEB -L $URL
+            sudo dpkg -i $DEB
+            rm $DEB
+            ;;
+    esac
+}
+install_exa() {
+    is_installed exa && return
+
+    case $(get_os) in
+        arch)          install_packet exa ;;
+        debian|ubuntu)
+            ZIP=$(mktemp --suffix zip -u)
+            URL=https://github.com/ogham/exa/releases/download/v0.9.0/exa-linux-x86_64-0.9.0.zip
+            curl -o $ZIP -L $URL
+            unzip $ZIP
+            sudo mv exa* /usr/bin/exa
+            rm $ZIP
+            ;;
+    esac
+}
+
+# dependencies
+install_packets \
+    curl \
+    unzip 
+
+install_packets \
+    exa \
+    fortune \
+    fzf \
+    git \
+    nmap \
+    ripgrep \
+    rsync \
+    sshfs
+
+export BASHDOTDIR=$RCFG_DIR
+exec bash --rcfile $RCFG_DIR/bashrc

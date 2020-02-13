@@ -1,0 +1,21 @@
+[user]
+	email = vanyarybin1@live.ru
+	name = i1i1
+[color]
+	ui = auto
+#[url "ssh://git@github.com/"]
+#	insteadOf = https://github.com/
+[url "ssh://git@gitlab.com/"]
+	insteadOf = https://gitlab.com/
+[alias]
+	am = commit --amend --no-edit
+	br = branch
+	ci = commit
+	cl = clone
+	cld = clone --depth=1
+	co = checkout
+    di = diff
+	hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+	last = log -1 HEAD
+	st = status
+    pu = push

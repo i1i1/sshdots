@@ -1,0 +1,12 @@
+alias ca=cargo
+alias dc=docker
+alias dcc=docker-compose
+alias g=git
+alias grep=rg
+alias l=ls
+alias la='ll -a'
+alias less='less -R'
+alias ll='ls -l'
+alias ls=ls_
+alias vi=vim
+alias vim=ec

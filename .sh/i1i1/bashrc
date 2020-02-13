@@ -1,0 +1,39 @@
+prompt() {
+	d=$(date '+%R:%S')
+    p=$(pwd|awk -F '/' -v h=$HOME '{
+		n=sub(h,"~")
+		if(!n && NF <= 2 || n && NF <= 3)
+			print $0
+		else if (!n && NF == 3)
+			print "/" $(NF - 1) "/" $NF
+		else print $(NF - 1) "/" $NF
+	}')
+    PS1="\[\e[38;5;174m\]$d\[\e[0m\] \u@\h \[\e[38;5;45m\]$p\[\e[0m\] \[\e[38;5;120m\]$\[\e[0m\] "
+}
+appendpath () {
+    case ":$PATH:" in
+        *:"$1":*) ;;
+        *) export PATH="$PATH:$1"
+    esac
+}
+
+# General
+for p in /sbin /usr/local/go/bin /usr/local/bin /usr/local/sbin \
+               $HOME/bin $HOME/.local/bin $HOME/.cargo/bin/; do
+    appendpath $p
+done
+
+export LC_ALL=en_US.utf8
+export PROMPT_COMMAND=prompt
+export GIT_CONFIG=$RCFG_DIR/gitconfig
+
+[ -z "$SSH_AUTH_SOCK" ] && {
+    eval `ssh-agent -s`
+    ssh-add
+}
+
+source $BASHDOTDIR/aliases
+source $BASHDOTDIR/functions
+source $BASHDOTDIR/fzf.bash
+
+fortune

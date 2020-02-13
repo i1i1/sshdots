@@ -1,0 +1,131 @@
+c() {
+    cd $(fd -t d . ~ | fzf)
+}
+
+diff() {
+    tmppipe=$(mktemp)
+    chmod 600 $tmppipe
+    env diff -u --color=always "$@" > $tmppipe
+    [ $? != 2 ] && cat $tmppipe | less -R
+    rm $tmppipe
+}
+
+ec() {
+    which emacs &>/dev/null && {
+        emacsclient -a "" -c $* 2>&1 >/dev/null &
+        disown
+    } || vim $*
+}
+
+ls_() {
+    which exa &>/dev/null && exa $* --color=auto || env ls $*
+}
+
+lsips() {
+    sudo true # just asking for sudo to make output look synchronous
+
+    ifconfig | \
+        awk '
+    /^$/ {
+        a = 1
+        next
+    }
+    a == 1 {
+        a = 2
+        dev = $1
+        next
+    }
+    a == 2 && /inet / {
+        a = 0
+        printf("% -8s %s\n", dev, $2)
+    }' | sort -h
+
+    echo
+
+    sudo nmap -n -sn 192.168.88.0/24 | \
+        sed 1d | \
+        awk 'FNR % 3 != 2' | \
+        sed '$d' | sed '$d' | \
+        awk '
+    FNR % 2 == 1 {
+        ip = $5
+    }
+    FNR % 2 == 0 {
+        sub(/^.*\(/, "")
+        sub(/\)$/, "")
+        printf("% -15s %s\n", ip":", $0)
+    }' | sort -h
+}
+
+lsssh() {
+    awk '/^Host /{host=$2} /HostName/{hostname=$2} /User/{user=$2}
+         /^$/{printf("% -20s%s@%s\n", host":", user, hostname)}' ~/.ssh/config
+}
+
+ssh() {
+    is_new_ssh() {
+        url=$(echo $1|awk -F@ '/@/{print $2;exit} {print}')
+        (
+            cut -d' ' -f1 ~/.ssh/known_hosts
+            awk '/^Host/{print $2}' ~/.ssh/config
+        ) | grep -qF $url && return 1
+        return 0
+    }
+    add_alias() {
+        user=$(echo $1|cut -d@ -f1)
+        url=$(echo $1|cut -d@ -f2)
+        printf "${YELLOW}New alias for ${NC}${RED}$1:${NC} "
+        read name
+        (
+            echo "Host $name"
+            echo "     HostName $url"
+            echo "     User $user"
+            echo
+        )  >> ~/.ssh/config 
+    }
+    add_agent() {
+        [ -z "$SSH_AUTH_SOCK" ] && {
+            eval `ssh-agent -s`
+            ssh-add
+        }
+    }
+    connect() {
+        env ssh $1 -t \
+            "export RCFG=i1i1;
+            export RCFG_DIR=\$HOME/.sh/\$RCFG/;
+            bash --rcfile \$RCFG_DIR/rc"
+    }
+    copy_config() {
+        tar czf - -C ~ .sh/ | ssh $1 tar xzfC - '~'
+    }
+
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[0;33m'
+    NC='\033[0m'
+
+
+    add_agent
+
+    [ $# != 1 ] && env ssh $@ && return $?
+    host=$1
+
+    is_new_ssh $host || {
+        copy_config $host
+        connect $host
+        return $?
+    }
+
+
+    printf "${RED}%s${NC} ${GREEN}%s${NC}\n" $host \
+           "is new ssh host."
+    add_alias $host
+    ssh-copy-id $host
+
+    printf "${GREEN}%s${NC}\n" "Copying shell configuration"
+    copy_config $host
+
+    printf "${GREEN}%s${NC}\n" "Done! Now loging in"
+    connect $host
+}
+
