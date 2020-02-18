@@ -6,9 +6,9 @@
 [url "git+ssh://git@"]
 	insteadOf = https://
 [alias]
-	am = commit --amend --no-edit
 	br = branch
 	ci = commit
+	cia = commit -a --amend --no-edit
 	cl = clone
 	cld = clone --depth=1
 	co = checkout

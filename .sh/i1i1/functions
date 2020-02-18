@@ -36,7 +36,7 @@ git_() {
             pu*) spawn_agent ;;
         esac
     }
-    env git $@
+    XDG_CONFIG_HOME=$RCFG_DIR env git "$@"
 }
 
 lsips() {

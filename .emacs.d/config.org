@@ -1,0 +1,551 @@
+#+STARTUP: overview
+#+TITLE: I1I1's Emacs
+#+CREATOR: i1i1
+#+OPTIONS: num:nil
+
+* Server
+#+BEGIN_SRC emacs-lisp
+  (require 'server)
+  (unless (server-running-p)
+    (server-start))
+#+END_SRC
+* Bash
+Setting default shell inside emacs to Bash
+#+BEGIN_SRC emacs-lisp
+  (defvar my-term-shell "/bin/bash")
+  (defadvice ansi-term (before force-bash)
+    (interactive (list my-term-shell)))
+
+  (ad-activate 'ansi-term)
+#+END_SRC
+* Gui
+** Bars and minor stuff
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+
+  (when window-system (global-prettify-symbols-mode t))
+
+  (setq-default ring-bell-function 'ignore)
+  (setq-default inhibit-startup-message t)
+#+END_SRC
+** Theme
+#+BEGIN_SRC emacs-lisp
+  (use-package solarized-theme)
+
+  (defvar bg-color-dark t)
+
+  (if bg-color-dark
+    (load-theme 'solarized-dark t)
+    (load-theme 'solarized-light t))
+
+#+END_SRC
+** Font, lines and linespace
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(font . "Go Mono-8"))
+  (setq-default line-spacing 10)
+  (global-linum-mode t)
+
+  (use-package linum-relative
+    :config
+    (setq linum-relative-current-symbol "")
+    (add-hook 'prog-mode-hook 'linum-relative-mode))
+#+END_SRC
+** Alias
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+** Config edit/reload
+*** edit
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/config.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+*** reload
+#+BEGIN_SRC emacs-lisp
+  (defun config-reload ()
+    (interactive)
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+  (global-set-key (kbd "C-c r") 'config-reload)
+#+END_SRC
+** Scrolling
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-margin 10
+        scroll-conservatively 9999
+        scroll-step 1)
+#+END_SRC
+** Modeline
+*** spaceline
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline
+    :config
+    (require 'spaceline-config)
+    (spaceline-spacemacs-theme)
+    (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+    (setq powerline-default-separator 'wave)
+    (setq spaceline-separator-dir-left '(right . right))
+    (setq spaceline-separator-dir-right '(left . left))
+    (setq powerline-height 50)
+    (spaceline-compile))
+#+END_SRC
+*** diminish
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :init
+    (add-hook 'prog-mode-hook
+              (lambda ()
+                (diminish 'hungry-delete-mode)
+                (diminish 'server-mode)
+                (diminish 'company-mode)
+                (diminish 'beacon-mode)
+                (diminish 'which-key-mode)
+                (diminish 'undo-tree-mode)
+                (diminish 'rainbow-mode)
+                (diminish 'projectile-mode)
+                (diminish 'page-break-lines-mode)
+                (diminish 'org-mode)
+                (diminish 'ivy-mode)
+                (diminish 'flycheck-mode)
+                (diminish 'undo-tree-mode)
+                (diminish 'hs-minor-mode)
+                (diminish 'yas-minor-mode)
+                (diminish 'irony-mode)
+                (diminish 'abbrev-mode)
+                (diminish 'auto-revert-mode)
+                (diminish 'linum-relative-mode))))
+#+END_SRC
+** Tab and spaces settings
+#+BEGIN_SRC emacs-lisp
+  (setq-default c-basic-offset 4 c-default-style "bsd")
+  (setq-default tab-width 4 indent-tabs-mode t)
+  (setq-default highlight-tabs t)
+#+END_SRC
+* Evil
+Evil is a package which responds for basic vim emulation.
+** Base
+#+BEGIN_SRC emacs-lisp
+  (setq evil-shift-width 80)
+
+  (use-package evil
+    :init
+    (evil-mode))
+
+  (setq evil-emacs-state-cursor '("red" box))
+  (setq evil-normal-state-cursor '("green" box))
+  (setq evil-visual-state-cursor '("orange" box))
+  (setq evil-insert-state-cursor '("red" bar))
+  (setq evil-replace-state-cursor '("red" bar))
+  (setq evil-operator-state-cursor '("red" hollow))
+#+END_SRC
+** Packages keybindings
+#+BEGIN_SRC emacs-lisp
+  (with-eval-after-load 'evil
+    ;; use evil mode in the buffer created from calling `list-packages'.
+    (add-to-list 'evil-buffer-regexps '("*Packages*" . normal))
+
+    (with-eval-after-load 'package
+      ;; movement keys j,k,l,h set up for free by defaulting to normal mode.
+      ;; mark, unmark, install
+      (evil-define-key 'normal package-menu-mode-map (kbd "m") #'package-menu-mark-install)
+      (evil-define-key 'normal package-menu-mode-map (kbd "u") #'package-menu-mark-unmark)
+      (evil-define-key 'normal package-menu-mode-map (kbd "x") #'package-menu-execute)))
+#+END_SRC
+** NeoTree
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :init
+    (global-set-key [f8] 'neotree-toggle)
+    (setq neo-theme 'arrow))
+
+  (add-hook 'neotree-mode-hook
+            (lambda ()
+              (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+              (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-quick-look)
+              (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+              (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)))
+#+END_SRC
+** C-j C-k
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-j") #'next-line)
+  (global-set-key (kbd "C-k") #'previous-line)
+#+END_SRC
+* COMMENT EXWM
+** Setup
+#+BEGIN_SRC emacs-lisp
+  ;;(use-package exwm
+  ;;  :config
+  ;;  (require 'exwm-config)
+  ;;  (exwm-config-default))
+#+END_SRC
+** System tray
+#+BEGIN_SRC emacs-lisp
+  ;;  (require 'exwm-systemtray)
+  ;;  (exwm-systemtray-enable)
+#+END_SRC
+** Dmenu
+#+BEGIN_SRC emacs-lisp
+  ;(use-package dmenu
+  ;  :bind
+  ;  ("s-d" . 'dmenu))
+#+END_SRC
+** Bindings
+#+BEGIN_SRC emacs-lisp
+  ;(defun exwm_lock()
+  ;  (interactive)
+  ;  (shell-command "i3lock-fancy && systemctl suspend"))
+
+  ;(global-set-key (kbd "s-s") 'exwm_lock)
+#+END_SRC
+* Which key
+Which key is a package which shows possible ways to complete the sequence of commands
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :init
+  (which-key-mode))
+#+END_SRC
+* Beacon and highlighting the line
+#+BEGIN_SRC emacs-lisp
+(use-package beacon
+  :init
+  (beacon-mode 1))
+(when window-system (global-hl-line-mode t))
+#+END_SRC
+* Org Mode
+** Base
+#+BEGIN_SRC emacs-lisp
+  (require 'linum-off)
+
+  ; Disable default split after " C-c ' " in org mode
+  (setq org-src-window-setup 'current-window)
+#+END_SRC
+** Org bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode))))
+#+END_SRC
+** Org Babel
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+END_SRC
+* Backup
+#+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist `(("." . "~/.saves")))
+  (setq backup-by-copying nil)
+  (setq make-backup-files nil)
+#+END_SRC
+* IDO
+** Base
+#+BEGIN_SRC emacs-lisp
+  (setq ido-enable-flex-matching t)
+  (setq ido-create-new-buffer 'always)
+  (setq ido-everywhere t)
+
+  (defun bind-ido-keys ()
+    "Keybindings for ido mode."
+    (define-key ido-completion-map (kbd "C-j") 'ido-next-match)
+    (define-key ido-completion-map (kbd "C-k") 'ido-prev-match))
+
+  (add-hook 'ido-setup-hook #'bind-ido-keys)
+
+  (ido-mode 1)
+#+END_SRC
+** IDO vertical
+#+BEGIN_SRC emacs-lisp
+  (use-package ido-vertical-mode
+    :init
+    (ido-vertical-mode 1))
+  (setq ido-vertical-define-keys 'j-and-k-only)
+#+END_SRC
+** Ido find files and switch buffers
+#+BEGIN_SRC emacs-lisp
+  (define-key evil-normal-state-map (kbd "C-f") 'ido-find-file)
+  (define-key evil-normal-state-map (kbd "C-\\") 'ido-switch-buffer)
+  (evil-define-key 'normal ido-completion-map (kbd "C-j") #'ido-prev-match)
+  (evil-define-key 'normal ido-completion-map (kbd "C-k") #'ido-next-match)
+#+END_SRC
+** SMEX
+#+BEGIN_SRC emacs-lisp
+  (use-package smex
+    :init
+    (setq smex-flex-matching t)
+    (define-key evil-normal-state-map (kbd "M-x") 'smex)
+    )
+#+END_SRC
+* Dashboard
+#+BEGIN_SRC emacs-lisp
+  (use-package page-break-lines
+    :init
+    (set-fontset-font "fontset-default"
+                      (cons page-break-lines-char page-break-lines-char)
+                      (face-attribute 'default :family))
+    (turn-on-page-break-lines-mode))
+  ;(use-package projectile
+  ;  :init
+  ;  (projectile-mode))
+
+  (require 'page-break-lines)
+  ;(require 'projectile)
+  (use-package dashboard
+    :config
+    (dashboard-setup-startup-hook)
+    )
+  ;; (setq dashboard-items '((recents . 10))))
+#+END_SRC
+* Projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-global-mode)
+    (setq projectile-completion-system 'ivy))
+#+END_SRC
+* Auto completion
+** Company
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :config
+    (setq company-idle-delay 0.1)
+    (setq company-minimum-prefix-length 4)
+    (setq company-tooltip-align-annotations t)
+    (global-company-mode))
+
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "M-n") nil)
+    (define-key company-active-map (kbd "M-p") nil)
+    (define-key company-active-map (kbd "C-j") #'company-select-next)
+    (define-key company-active-map (kbd "C-k") #'company-select-previous)
+    (define-key company-active-map (kbd "SPC") #'company-abort)
+    (define-key company-active-map (kbd "TAB") #'company-abort))
+
+  (with-eval-after-load 'company
+    (add-hook 'prog-mode-hook 'company-mode))
+#+END_SRC
+** Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+	:config
+	(add-hook 'prog-mode-hook 'flycheck-mode))
+  (use-package quick-peek)
+  (use-package flycheck-inline
+	:after flycheck
+	:config
+	(add-hook 'flycheck-mode-hook #'flycheck-inline-mode)
+	(setq flycheck-inline-display-function
+	  (lambda (msg pos)
+		(let* ((ov (quick-peek-overlay-ensure-at pos))
+		   (contents (quick-peek-overlay-contents ov)))
+		(setf (quick-peek-overlay-contents ov)
+			(concat contents (when contents "\n") msg))
+		(quick-peek-update ov)))
+	  flycheck-inline-clear-function #'quick-peek-hide))
+  (use-package flycheck-popup-tip
+	:after flycheck
+	:init
+	(with-eval-after-load 'flycheck
+	  '(add-hook 'flycheck-mode-hook 'flycheck-popup-tip-mode)))
+#+END_SRC
+** Irony (c and c++ AuComp)
+#+BEGIN_SRC emacs-lisp
+  (use-package company-irony
+    :ensure t
+    :config
+    (require 'company)
+    (add-to-list 'company-backend 'company-irony))
+
+  (use-package irony
+    :config
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode)
+    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options))
+
+  (use-package flycheck-irony
+    :after flycheck irony
+    :config)
+    ;(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+#+END_SRC
+** Jedi (python)
+#+BEGIN_SRC emacs-lisp
+  (use-package ein)
+  (use-package jedi-core)
+  (use-package company-jedi)
+  (use-package company-quickhelp
+    :init
+    (setq company-quickhelp-max-lines nil)
+    (setq pos-tip-internal-border-width 10)
+    (company-quickhelp-mode))
+
+  (defun my/python-mode-hook ()
+    (add-to-list 'company-backends 'company-jedi))
+
+  (add-hook 'python-mode-hook 'my/python-mode-hook)
+#+END_SRC
+** Go lang
+#+BEGIN_SRC emacs-lisp
+  (use-package company-go
+    :init
+    (setq company-go-begin-after-member-access t))
+  (add-hook 'go-mode-hook
+            (lambda ()
+              (add-to-list 'company-backends 'company-go)))
+#+END_SRC
+** Java
+#+BEGIN_SRC emacs-lisp
+  (use-package meghanada)
+  (add-hook 'java-mode-hook
+			(lambda ()
+			  ;; meghanada-mode on
+			  (meghanada-mode t)
+			  (flycheck-mode +1)
+			  (setq c-basic-offset 2)
+			  ;; use code format
+			  (add-hook 'before-save-hook 'meghanada-code-beautify-before-save)))
+  (cond
+	 ((eq system-type 'windows-nt)
+	  (setq meghanada-java-path (expand-file-name "bin/java.exe" (getenv "JAVA_HOME")))
+	  (setq meghanada-maven-path "mvn.cmd"))
+	 (t
+	  (setq meghanada-java-path "java")
+	  (setq meghanada-maven-path "mvn")))
+#+END_SRC
+** C headers
+#+BEGIN_SRC emacs-lisp
+  (use-package company-c-headers
+    :after company
+    :init
+    (add-to-list 'company-backends 'company-c-headers)
+    (setq company-c-headers-path-system
+          (list "." "../include/" "./include" "/usr/include")))
+#+END_SRC
+** Compete brackets and other stuff
+#+BEGIN_SRC emacs-lisp
+  (setq electric-pair-pairs '(
+                              (?\( . ?\))
+                              (?\[ . ?\])
+                              (?\" . ?\")
+                              ))
+  (electric-pair-mode t)
+#+END_SRC
+* Snippets
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :config
+    (use-package yasnippet-snippets)
+    (yas-reload-all)
+    (add-hook 'prog-mode-hook 'yas-minor-mode))
+#+END_SRC
+* Search stuff
+** Swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :init
+    (define-key
+      evil-normal-state-map (kbd "?") 'swiper)
+    (define-key
+      evil-normal-state-map (kbd "/") 'swiper))
+#+END_SRC
+** Ivy
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :init
+    (ivy-mode t)
+    (define-key ivy-mode-map (kbd "C-j") #'ivy-next-line)
+    (define-key ivy-mode-map (kbd "C-k") #'ivy-previous-line))
+#+END_SRC
+** Counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel)
+#+END_SRC
+* MaGIT
+#+BEGIN_SRC emacs-lisp
+;  (setq split-width-threshold 0)
+;  (setq split-height-threshold nil)
+  (use-package magit)
+  (use-package evil-magit
+    :init
+    (evil-magit-init))
+#+END_SRC
+* Clojure lang for brave!
+#+BEGIN_SRC emacs-lisp
+  (use-package clojure-mode)
+  (use-package cider)
+  (use-package better-defaults)
+  (use-package paredit)
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+#+END_SRC
+* Minor issues
+** Hungry-delete
+#+BEGIN_SRC emacs-lisp
+  (use-package hungry-delete
+    :config (global-hungry-delete-mode))
+#+END_SRC
+** Rainbow delemeters
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :init (rainbow-mode 1))
+  (use-package rainbow-delimiters
+    :init
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+#+END_SRC
+** Clock
+#+BEGIN_SRC emacs-lisp
+  (setq display-time-24hr-format t)
+  (display-time-mode 1)
+#+END_SRC
+** FFAP
+#+BEGIN_SRC emacs-lisp
+  (setq ffap-c-path (list "." "../include/" "./include" "/usr/include"))
+#+END_SRC
+** Folding
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'hs-minor-mode)
+#+END_SRC
+** Eiffel lang
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.e\\'" . eiffel-mode))
+  (autoload 'eiffel-mode "eiffel" "Major mode for Eiffel programs" t)
+#+END_SRC
+** Go lang
+#+BEGIN_SRC emacs-lisp
+    (use-package go-mode)
+#+END_SRC
+** Vala lang
+#+BEGIN_SRC emacs-lisp
+    (use-package vala-mode)
+#+END_SRC
+
+** Rust lang
+#+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+	:config
+	(setq rust-format-on-save t))
+  (use-package flycheck-rust
+	:after rust-mode
+	:config
+	(with-eval-after-load 'rust-mode
+	  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+  (use-package racer
+	:after rust-mode
+	:config
+	(add-hook 'rust-mode-hook #'racer-mode)
+	(add-hook 'racer-mode-hook #'eldoc-mode))
+#+END_SRC
+** MarkDown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode)
+#+END_SRC
+** Gdb (GUD)
+#+BEGIN_SRC emacs-lisp
+  (setq gdb-show-main t)
+#+END_SRC
