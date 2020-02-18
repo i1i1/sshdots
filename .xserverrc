@@ -1,0 +1,7 @@
+#!/bin/sh
+exec /usr/lib/Xorg :0 vt$XDG_VTNR \
+     -nolisten tcp \
+     -keeptty \
+     -auth /tmp/serverauth.nfstuVQNKA \
+     -ardelay 175 \
+     -arinterval 23
