@@ -1,0 +1,4 @@
+#!/bin/sh
+while sleep 300; do
+    wget -O - https://unsplash.it/2560/1440/?random | feh --bg-scale -
+done

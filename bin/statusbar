@@ -1,0 +1,88 @@
+#!/usr/bin/gawk -f
+
+BEGIN {
+	s=" "
+	main()
+	exit(0)
+}
+
+func getln(cmd,	tmp) {
+	cmd | getline tmp
+	close(cmd)
+	return tmp
+}
+
+func color(s, clr) {
+	return s
+#	return "<span foreground=\""clr"\">"s"</span>"
+}
+
+func sound() {
+	return color(" ", "#007000")getln("mixer|grep vol|cut -d':' -f2")"%"
+}
+
+func brightness() {
+    cur = getln("cat /sys/class/backlight/intel_backlight/brightness")
+    max = getln("cat /sys/class/backlight/intel_backlight/max_brightness")
+    per = sprintf("%d", cur * 100 / max)
+	return color(" ", "#007070")per"%"
+}
+
+func wifi(	net, cmd) {
+	cmd="iw dev wlp3s0 link|awk '/SSID/{print $2}'"
+	net=getln(cmd)
+	if (net == "\"\"")
+		return ""
+	return color(" ", "#804040")net
+}
+
+func cpu(	usage, ncpu, res) {
+	ncpu=getln("cat /proc/cpuinfo|grep proce|wc -l")
+	usage=getln("ps -Ao %cpu|awk '{a+=$1}END{print a}'")
+	res=sprintf("%d%%", usage/ncpu)
+	return color(" ", "#8050a0")res
+}
+
+func memory(	cmd) {
+	cmd="free |awk '/Mem/{printf(\"%d%%\", 100 - $7*100/$2)}'"
+	return color(" ", "#a06540")getln(cmd)
+}
+
+func time() {
+	return color(" ", "#5080f0")getln("date '+%H:%M'")
+}
+
+func date() {
+	return color(" ", "#5050a0")getln("date '+%b %d'")
+}
+
+func battery(	clr, per, state, rem) {
+	clr = color(" ", "#80a050")
+	state = getln("acpi|tr -d ','|cut -d' ' -f3")
+	per =   getln("acpi|tr -d ','|cut -d' ' -f4")
+	rem =   getln("acpi|tr -d ','|cut -d' ' -f5")
+
+	if (state == "Discharging")
+		return clr per " "  rem
+	else
+		return clr per "+ " rem
+}
+
+func layout() {
+    l = getln("xset -q | grep LED| awk '{print $NF}'")
+    return l == 1000 ? "ru" : "en"
+}
+
+func main() {
+	a=    time()
+	a=a s date()
+	a=a s cpu()
+	a=a s memory()
+	a=a s wifi()
+#	a=a s sound()
+	a=a s brightness()
+	a=a s battery()
+	a=a s layout()
+	print " "a" "
+}
+

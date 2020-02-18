@@ -1,0 +1,4 @@
+#!/bin/sh
+export RCFG=$1
+export RCFG_DIR=~/.sh/$RCFG/
+. $RCFG_DIR/rc

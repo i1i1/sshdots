@@ -1,0 +1,8 @@
+super + d
+    dmenu_run
+super + Return
+    st
+super + shift + u
+    dumount
+super + shift + m
+    drandr
