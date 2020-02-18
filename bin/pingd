@@ -3,10 +3,10 @@ int=no
 num=0
 
 while sleep 1; do
-	ping -c 4 1.1.1.1 2>&1 >/dev/null
-	res=$?
+    ping -c 4 1.1.1.1 2>&1 >/dev/null
+    res=$?
 
-	if [ $res = 1 -a $int = yes ]; then
+    if [ $res = 1 -a $int = yes ]; then
         num=$((num + 1))
         if [ $num = 5 ]; then
             notify-send "No internet duuuuude!"

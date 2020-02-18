@@ -1,112 +1,112 @@
 #!/usr/bin/gawk -f
-func in_arr(item, arr,	i) {
-	for (i = 1; i < arr[0]; i++)
-		if (arr[i] == item)
-			return "yes"
-	return "no"
+func in_arr(item, arr,     i) {
+    for (i = 1; i < arr[0]; i++)
+        if (arr[i] == item)
+            return "yes"
+    return "no"
 }
 
-func mount(dev, dir, opt,	cmd) {
-	cmd = "lxqt-sudo mount "opt" "dev" "dir
-	system(cmd)
+func mount(dev, dir, opt,     cmd) {
+    cmd = "lxqt-sudo mount "opt" "dev" "dir
+    system(cmd)
 }
 
 func umount(dir) {
-	cmd = "lxqt-sudo umount "dir""
-	system(cmd)
+    cmd = "lxqt-sudo umount "dir""
+    system(cmd)
 }
 
-func devcapacity(d,	cmd, arr, s, cap, i) {
-	sub("^/dev/", "", d)
-	
-	cmd = "cat /proc/partitions |sed -e 1d -e 2d|grep "d"$"
-	cmd | getline s
-	close(cmd)
+func devcapacity(d,     cmd, arr, s, cap, i) {
+    sub("^/dev/", "", d)
 
-	split(s, arr, " ")
-	cap = arr[3]
+    cmd = "cat /proc/partitions |sed -e 1d -e 2d|grep "d"$"
+    cmd | getline s
+    close(cmd)
 
-	for (i = 0; cap / 1024 > 2; i++)
-		cap /= 1024
+    split(s, arr, " ")
+    cap = arr[3]
 
-	cap = sprintf("%.0f", cap)
+    for (i = 0; cap / 1024 > 2; i++)
+        cap /= 1024
 
-	switch (i) {
-		case 0:
-			cap = cap "K"
-			break;
-		case 1:
-			cap = cap "M"
-			break;
-		case 2:
-			cap = cap "G"
-			break;
-		case 3:
-			cap = cap "T"
-			break;
-		default:
-			cap = "Its Over 9000!!!"
-	}
+    cap = sprintf("%.0f", cap)
 
-	return cap
+    switch (i) {
+        case 0:
+            cap = cap "K"
+            break;
+        case 1:
+            cap = cap "M"
+            break;
+        case 2:
+            cap = cap "G"
+            break;
+        case 3:
+            cap = cap "T"
+            break;
+        default:
+            cap = "Its Over 9000!!!"
+    }
+
+    return cap
 }
 
-func devdir(d,	cmd, s) {
-	cmd = "cat /proc/mounts|grep ^"d"|cut -d' ' -f2"
-	cmd | getline s
-	close(cmd)
+func devdir(d,     cmd, s) {
+    cmd = "cat /proc/mounts|grep ^"d"|cut -d' ' -f2"
+    cmd | getline s
+    close(cmd)
 
-	if (!s) {
-		if (system("cat /proc/swaps|grep ^"d"") == 0)
-			s = "swap"
-		close(cmd)
-	}
+    if (!s) {
+        if (system("cat /proc/swaps|grep ^"d"") == 0)
+            s = "swap"
+        close(cmd)
+    }
 
-	return s
+    return s
 }
 
 func mkdir(d) {
-	cmd = "lxqt-sudo \"mkdir -p "d"\""
-	system(cmd)
+    cmd = "lxqt-sudo \"mkdir -p "d"\""
+    system(cmd)
 }
 
-func lsdevs(res,	cmd, ln, i, md) {
-	cmd = "ls /dev/sd*"
-	i = 1
+func lsdevs(res,     cmd, ln, i, md) {
+    cmd = "ls /dev/sd*"
+    i = 1
 
-	while (cmd | getline ln > 0) {
-		md = ln
-		sub(/[0-9]+$/, "", md)
-		if (i > 0 && res[i - 1] == md)
-			res[i - 1] = ln
-		else
-			res[i++] = ln
-	}
+    while (cmd | getline ln > 0) {
+        md = ln
+        sub(/[0-9]+$/, "", md)
+        if (i > 0 && res[i - 1] == md)
+            res[i - 1] = ln
+        else
+            res[i++] = ln
+    }
 
-	res[0] = i
-	close(cmd)
+    res[0] = i
+    close(cmd)
 }
 
-func lsmntdevs(res,	cmd, ln, i) {
-	cmd = "cat /proc/mounts|grep ^/dev/sd|cut -d' ' -f1"
+func lsmntdevs(res,     cmd, ln, i) {
+    cmd = "cat /proc/mounts|grep ^/dev/sd|cut -d' ' -f1"
 
-	i = 1
+    i = 1
 
-	while (cmd | getline ln > 0)
-		res[i++] = ln
+    while (cmd | getline ln > 0)
+        res[i++] = ln
 
-	close(cmd)
-	cmd = "cat /proc/swaps|grep ^/dev/sd|cut -d' ' -f1"
+    close(cmd)
+    cmd = "cat /proc/swaps|grep ^/dev/sd|cut -d' ' -f1"
 
-	while (cmd | getline ln > 0)
-		res[i++] = ln
+    while (cmd | getline ln > 0)
+        res[i++] = ln
 
-	res[0] = i
-	close(cmd)
+    res[0] = i
+    close(cmd)
 }
 
 func sleep(sec) {
-	system("sleep " sec)
+    system("sleep " sec)
 }
 
 # Some python pseudocode
@@ -115,162 +115,162 @@ func sleep(sec) {
 # for thing in a:
 #   if thing not in b:
 #     c.append(thing)
-func diff(c, a, b,	i, j, k, fl) {
-	k = 1;
+func diff(c, a, b,     i, j, k, fl) {
+    k = 1;
 
-	for (i = 1; i < a[0]; i++) {
-		fl = 0;
+    for (i = 1; i < a[0]; i++) {
+        fl = 0;
 
-		for (j = 1; j < b[0]; j++) {
-			if (a[i] == b[j]) {
-				fl = 1
-				break;
-			}
-		}
+        for (j = 1; j < b[0]; j++) {
+            if (a[i] == b[j]) {
+                fl = 1
+                break;
+            }
+        }
 
-		if (fl == 1)
-			continue
+        if (fl == 1)
+            continue
 
-		c[k++] = a[i]
-	}
+        c[k++] = a[i]
+    }
 
-	c[0] = k
+    c[0] = k
 }
 
-func ask(s, l,	cmd, res, i) {
-	cmd = "printf '"
-	for (i = 1; i < l[0]; i++)
-		cmd = cmd l[i] "\\n"
-	cmd = cmd "'|dmenu -p '" s "'"
+func ask(s, l,     cmd, res, i) {
+    cmd = "printf '"
+    for (i = 1; i < l[0]; i++)
+        cmd = cmd l[i] "\\n"
+    cmd = cmd "'|dmenu -p '" s "'"
 
-	cmd | getline res
-	close(cmd)
+    cmd | getline res
+    close(cmd)
 
-	return res
+    return res
 }
 
 # 'a' = 'b', if 'a' and 'b' are arrays
-func arrset(a, b,	i) {
-	for (i = 1; i < b[0]; i++)
-		a[i] = b[i]
-	a[0] = b[0]
+func arrset(a, b,     i) {
+    for (i = 1; i < b[0]; i++)
+        a[i] = b[i]
+    a[0] = b[0]
 }
 
-func lsmntdirs(res,	i, ln, cmd) {
-	cmd = "ls /mnt/"
-	i = 1
+func lsmntdirs(res,     i, ln, cmd) {
+    cmd = "ls /mnt/"
+    i = 1
 
-	while (cmd | getline ln > 0)
-		if (mntdirvalid("/mnt/"ln) == "yes")
-			res[i++] = ln
+    while (cmd | getline ln > 0)
+        if (mntdirvalid("/mnt/"ln) == "yes")
+            res[i++] = ln
 
-	res[0] = i
-	close(cmd)
+    res[0] = i
+    close(cmd)
 }
 
-func mntdevvalid(d,	cmd, devs, i) {
-	if (d == "/dev/sda5" || d == "/dev/sda7")
-		return "no"
+func mntdevvalid(d,     cmd, devs, i) {
+    if (d == "/dev/sda5" || d == "/dev/sda7")
+        return "no"
 
-	lsmntdevs(devs)
+    lsmntdevs(devs)
 
-	for (i = 1; i < devs[0]; i++)
-		if (devs[i] == d)
-			return "yes"
+    for (i = 1; i < devs[0]; i++)
+        if (devs[i] == d)
+            return "yes"
 
-	return "no"
+    return "no"
 }
 
-func mntdirvalid(d,	cmd) {
-	if (d !~ /^\//)
-		return "no"
+func mntdirvalid(d,     cmd) {
+    if (d !~ /^\//)
+        return "no"
 
-	if (dir(d) == "no")
-		return "no"
+    if (dir(d) == "no")
+        return "no"
 
-	cmd = "cat /proc/mounts|cut -d' ' -f2|grep '"d"'"
-	if (system(cmd) == 0) {
-		close(cmd)
-		return "no"
-	}
-	close(cmd)
+    cmd = "cat /proc/mounts|cut -d' ' -f2|grep '"d"'"
+    if (system(cmd) == 0) {
+        close(cmd)
+        return "no"
+    }
+    close(cmd)
 
-	cmd = "ls "d
-	if (cmd | getline > 0) {
-		close(cmd)
-		return "no"
-	}
-	close(cmd)
+    cmd = "ls "d
+    if (cmd | getline > 0) {
+        close(cmd)
+        return "no"
+    }
+    close(cmd)
 
-	return "yes"
+    return "yes"
 }
 
-func dir(d,	cmd) {
-	cmd = "test -d '"d"'"
-	if (system(cmd) != 0)
-		return "no"
-	return "yes"
+func dir(d,     cmd) {
+    cmd = "test -d '"d"'"
+    if (system(cmd) != 0)
+        return "no"
+    return "yes"
 }
 
 # It is above ^
 # @include "lib.awk"
 
-func main(	devs, mnt, d, i, j, where, opt) {
-	for (;;) {
-		lsdevs(devs)
-		lsmntdevs(mnt)
+func main(     devs, mnt, d, i, j, where, opt) {
+    for (;;) {
+        lsdevs(devs)
+        lsmntdevs(mnt)
 
-		for (i = 1; i < omm[0]; i++) {
-			if (in_arr(omm[i], devs) == "yes")
-				continue
+        for (i = 1; i < omm[0]; i++) {
+            if (in_arr(omm[i], devs) == "yes")
+                continue
 
-			for (j = i; j < omm[0] - 1; j++)
-				omm[j] = omm[j + 1]
+            for (j = i; j < omm[0] - 1; j++)
+                omm[j] = omm[j + 1]
 
-			omm[0]--
-		}
+            omm[0]--
+        }
 
-		diff(d, devs, mnt) # d = devs - mnt
-		arrset(devs, d)    # devs = d
-		diff(d, devs, omm) # d = devs - omm
-		arrset(devs, d)    # devs = d
+        diff(d, devs, mnt) # d = devs - mnt
+        arrset(devs, d)    # devs = d
+        diff(d, devs, omm) # d = devs - omm
+        arrset(devs, d)    # devs = d
 
-		for (i = 1; i < d[0]; i++) {
-			opt = "-o umask=000,sync"
+        for (i = 1; i < d[0]; i++) {
+            opt = "-o umask=000,sync"
 
-			if (ask("Mount "d[i]" ("devcapacity(d[i])")?", yn) != "yes") {
-				omm[omm[0]++] = d[i]
-				continue;
-			}
+            if (ask("Mount "d[i]" ("devcapacity(d[i])")?", yn) != "yes") {
+                omm[omm[0]++] = d[i]
+                continue;
+            }
 
-			lsmntdirs(where)
+            lsmntdirs(where)
 
-			do {
-				dst = ask("Where should we mount? (/mnt/)", where)
-				dst = "/mnt/" dst
-			} while (dir(dst) == "yes" && mntdirvalid(dst) == "no")
+            do {
+                dst = ask("Where should we mount? (/mnt/)", where)
+                dst = "/mnt/" dst
+            } while (dir(dst) == "yes" && mntdirvalid(dst) == "no")
 
-			if (dir(dst) == "no")
-				mkdir(dst)
+            if (dir(dst) == "no")
+                mkdir(dst)
 
-			mount(d[i], dst, opt)
-		}
-		sleep(1)
-	}
+            mount(d[i], dst, opt)
+        }
+        sleep(1)
+    }
 }
 
 BEGIN {
-	yn[0] = 3
-	yn[1] = "yes"
-	yn[2] = "no"
+    yn[0] = 3
+    yn[1] = "yes"
+    yn[2] = "no"
 
-	# Add here devices what should be ommited
-	# F.e. my /dev/sda1 device some backup windows partition
-	#         /dev/sda3 is of type Extended
-	omm[0] = 3
-	omm[1] = "/dev/sda1"
-	omm[2] = "/dev/sda3"
+    # Add here devices what should be ommited
+    # F.e. my /dev/sda1 device some backup windows partition
+    #         /dev/sda3 is of type Extended
+    omm[0] = 3
+    omm[1] = "/dev/sda1"
+    omm[2] = "/dev/sda3"
 
-	main()
-	exit 0
+    main()
+    exit 0
 }
