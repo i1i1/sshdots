@@ -1,23 +1,3 @@
-prompt() {
-    d=$(date +%R:%S)
-    p=$(pwd|awk -F/ -v h=$HOME '{
-        n=sub(h,"~")
-        if(!n && NF <= 2 || n && NF <= 3)
-            print $0
-        else if (!n && NF == 3)
-            print "/" $(NF - 1) "/" $NF
-        else print $(NF - 1) "/" $NF
-    }')
-
-    u="\u@\h"
-    [ ! -z "$RCFG_EXT" ] && u="\[\e[0;32m\]$u\[\e[0m\]"
-
-    d="\[\e[38;5;174m\]$d\[\e[0m\]"
-    p="\[\e[38;5;45m\]$p\[\e[0m\]"
-    dollar="\[\e[38;5;120m\]$\[\e[0m\]"
-
-    PS1="$d $u $p $dollar "
-}
 appendpath () {
     case ":$PATH:" in
         *:"$1":*) ;;
@@ -25,18 +5,21 @@ appendpath () {
     esac
 }
 
-# General
 for p in /sbin /usr/local/go/bin /usr/local/bin /usr/local/sbin \
                $HOME/bin $HOME/.local/bin $HOME/.cargo/bin/; do
     appendpath $p
 done
 
-export LC_ALL=en_US.utf8
-export PROMPT_COMMAND=prompt
+export DEFAULT_USER=i1i1
 export GIT_CONFIG=$RCFG_DIR/gitconfig
+export LC_ALL=en_US.utf8
+export TERM=xterm-256color
+
+eval `dircolors $BASHDOTDIR/dircolors`
 
 source $BASHDOTDIR/aliases
 source $BASHDOTDIR/functions
+source $BASHDOTDIR/prompt
 
 which fzf &>/dev/null && source $BASHDOTDIR/autocompletion/fzf.bash
 
