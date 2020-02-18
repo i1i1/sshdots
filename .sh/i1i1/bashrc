@@ -37,4 +37,9 @@ export GIT_CONFIG=$RCFG_DIR/gitconfig
 
 source $BASHDOTDIR/aliases
 source $BASHDOTDIR/functions
-which fzf &>/dev/null && source $BASHDOTDIR/fzf.bash
+
+which fzf &>/dev/null && source $BASHDOTDIR/autocompletion/fzf.bash
+
+for file in $(ls $BASHDOTDIR/autocompletion | grep -v fzf); do
+    source $BASHDOTDIR/autocompletion/$file
+done
