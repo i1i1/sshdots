@@ -1,3 +1,10 @@
+spawn_agent() {
+    [ -z "$SSH_AUTH_SOCK" ] && {
+        eval `ssh-agent -s`
+        ssh-add
+    }
+}
+
 c() {
     cd $(fd -t d . ~ | fzf)
 }
@@ -6,19 +13,30 @@ diff() {
     tmppipe=$(mktemp)
     chmod 600 $tmppipe
     env diff -u --color=always "$@" > $tmppipe
-    [ $? != 2 ] && cat $tmppipe | less -R
+    ret=$?
+    case $ret in
+        1) cat $tmppipe | less -R ;;
+        0) echo Files are same ;;
+    esac
     rm $tmppipe
+    return $ret
 }
 
 ec() {
     which emacs &>/dev/null && {
-        emacsclient -a "" -c $* 2>&1 >/dev/null &
+        emacsclient -a "" -c $* &>/dev/null &
         disown
-    } || vim $*
+    } || env vim $*
 }
 
-ls_() {
-    which exa &>/dev/null && exa $* --color=auto || env ls $*
+git_() {
+    [ $# != 0 ] && {
+        case $1 in
+            cl*) ;&
+            pu*) spawn_agent ;;
+        esac
+    }
+    env git $@
 }
 
 lsips() {
@@ -74,7 +92,8 @@ ssh() {
     add_alias() {
         user=$(echo $1|cut -d@ -f1)
         url=$(echo $1|cut -d@ -f2)
-        printf "${YELLOW}New alias for ${NC}${RED}$1:${NC} "
+        yellow "New alias for "
+        red    "$1: "
         read name
         (
             echo "Host $name"
@@ -83,29 +102,34 @@ ssh() {
             echo
         )  >> ~/.ssh/config 
     }
-    add_agent() {
-        [ -z "$SSH_AUTH_SOCK" ] && {
-            eval `ssh-agent -s`
-            ssh-add
-        }
-    }
     connect() {
         env ssh $1 -t \
             "export RCFG=i1i1;
-            export RCFG_DIR=\$HOME/.sh/\$RCFG/;
-            bash --rcfile \$RCFG_DIR/rc"
+             export RCFG_DIR=\$HOME/.sh/\$RCFG/;
+             export RCFG_EXT=1;
+             bash --rcfile \$RCFG_DIR/rc"
     }
     copy_config() {
         tar czf - -C ~ .sh/ | ssh $1 tar xzfC - '~'
     }
+    color() {
+        printf "\033[0;$1m"
+        shift 1
+        printf "$@"
+        printf '\033[0m'
+    }
+    red() {
+        color 31 "$@"
+    }
+    green() {
+        color 32 "$@"
+    }
+    yellow() {
+        color 33 "$@"
+    }
 
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    YELLOW='\033[0;33m'
-    NC='\033[0m'
 
-
-    add_agent
+    spawn_agent
 
     [ $# != 1 ] && env ssh $@ && return $?
     host=$1
@@ -116,16 +140,15 @@ ssh() {
         return $?
     }
 
-
-    printf "${RED}%s${NC} ${GREEN}%s${NC}\n" $host \
-           "is new ssh host."
+    red "$host "
+    green "is new ssh host.\n"
     add_alias $host
     ssh-copy-id $host
 
-    printf "${GREEN}%s${NC}\n" "Copying shell configuration"
+    green "Copying shell configuration\n"
     copy_config $host
 
-    printf "${GREEN}%s${NC}\n" "Done! Now loging in"
+    green "Done! Now loging in\n"
     connect $host
 }
 

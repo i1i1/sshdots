@@ -1,12 +1,30 @@
+is_installed() {
+    which $1 &>/dev/null
+}
+
 alias ca=cargo
 alias dc=docker
 alias dcc=docker-compose
 alias g=git
-alias grep=rg
+alias git=git_
+alias grep='grep_ --color=auto'
 alias l=ls
 alias la='ll -a'
 alias less='less -R'
 alias ll='ls -l'
-alias ls=ls_
+alias ls='ls_ --color=auto'
 alias vi=vim
 alias vim=ec
+
+if is_installed rg; then
+    alias grep_=rg
+else
+    alias grep_='env grep'
+fi
+
+if is_installed exa; then
+    alias ls_=exa
+else
+    alias ls_='env ls'
+fi
+

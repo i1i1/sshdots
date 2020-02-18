@@ -3,10 +3,8 @@
 	name = i1i1
 [color]
 	ui = auto
-#[url "ssh://git@github.com/"]
-#	insteadOf = https://github.com/
-[url "ssh://git@gitlab.com/"]
-	insteadOf = https://gitlab.com/
+[url "git+ssh://git@"]
+	insteadOf = https://
 [alias]
 	am = commit --amend --no-edit
 	br = branch

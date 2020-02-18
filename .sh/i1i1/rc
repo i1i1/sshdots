@@ -6,8 +6,8 @@ get_os() {
 }
 install_packet() {
     case $(get_os) in
-        arch)          sudo pacman -S --confirm $* ;;
-        debian|ubuntu) sudo apt install -y $* ;;
+        arch)              sudo pacman -S --confirm $* ;;
+        raspbian|debian|ubuntu) sudo apt install -y $* ;;
     esac
 }
 install_packets() {
@@ -23,7 +23,9 @@ install_fzf() {
 
     case $(get_os) in
         arch)          install_packet fzf ;;
+        raspbian) ;;
         debian|ubuntu)
+            [ $(uname -m) != x86_64 ] && return
             (
                 cd /usr/bin/
                 curl -L https://github.com/junegunn/fzf-bin/releases/download/0.20.0/fzf-0.20.0-linux_amd64.tgz | \
@@ -37,7 +39,10 @@ install_ripgrep() {
 
     case $(get_os) in
         arch)          install_packet ripgrep ;;
+        raspbian) ;;
         debian|ubuntu)
+            [ $(uname -m) != x86_64 ] && return
+
             DEB=$(mktemp --suffix deb -u)
             URL=https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
             curl -o $DEB -L $URL
@@ -51,7 +56,10 @@ install_exa() {
 
     case $(get_os) in
         arch)          install_packet exa ;;
+        raspbian) ;;
         debian|ubuntu)
+            [ $(uname -m) != x86_64 ] && return
+
             ZIP=$(mktemp --suffix zip -u)
             URL=https://github.com/ogham/exa/releases/download/v0.9.0/exa-linux-x86_64-0.9.0.zip
             curl -o $ZIP -L $URL

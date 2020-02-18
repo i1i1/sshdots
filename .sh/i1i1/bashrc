@@ -1,14 +1,22 @@
 prompt() {
-	d=$(date '+%R:%S')
-    p=$(pwd|awk -F '/' -v h=$HOME '{
-		n=sub(h,"~")
-		if(!n && NF <= 2 || n && NF <= 3)
-			print $0
-		else if (!n && NF == 3)
-			print "/" $(NF - 1) "/" $NF
-		else print $(NF - 1) "/" $NF
-	}')
-    PS1="\[\e[38;5;174m\]$d\[\e[0m\] \u@\h \[\e[38;5;45m\]$p\[\e[0m\] \[\e[38;5;120m\]$\[\e[0m\] "
+    d=$(date +%R:%S)
+    p=$(pwd|awk -F/ -v h=$HOME '{
+        n=sub(h,"~")
+        if(!n && NF <= 2 || n && NF <= 3)
+            print $0
+        else if (!n && NF == 3)
+            print "/" $(NF - 1) "/" $NF
+        else print $(NF - 1) "/" $NF
+    }')
+
+    u="\u@\h"
+    [ ! -z "$RCFG_EXT" ] && u="\[\e[0;32m\]$u\[\e[0m\]"
+
+    d="\[\e[38;5;174m\]$d\[\e[0m\]"
+    p="\[\e[38;5;45m\]$p\[\e[0m\]"
+    dollar="\[\e[38;5;120m\]$\[\e[0m\]"
+
+    PS1="$d $u $p $dollar "
 }
 appendpath () {
     case ":$PATH:" in
@@ -27,13 +35,6 @@ export LC_ALL=en_US.utf8
 export PROMPT_COMMAND=prompt
 export GIT_CONFIG=$RCFG_DIR/gitconfig
 
-[ -z "$SSH_AUTH_SOCK" ] && {
-    eval `ssh-agent -s`
-    ssh-add
-}
-
 source $BASHDOTDIR/aliases
 source $BASHDOTDIR/functions
-source $BASHDOTDIR/fzf.bash
-
-fortune
+which fzf &>/dev/null && source $BASHDOTDIR/fzf.bash
