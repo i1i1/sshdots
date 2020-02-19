@@ -6,7 +6,7 @@ spawn_agent() {
 }
 
 c() {
-    cd $(fd -t d . ~ | fzf)
+    cd $(fd -t d . ~ | sed "s!^$HOME!~!" | fzf | sed "s!^~!$HOME!")
 }
 
 diff() {

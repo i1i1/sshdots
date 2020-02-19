@@ -1,0 +1,8 @@
+.config/hydroxide
+.emacs.d/auto-save-list/
+.emacs.d/config.el
+.emacs.d/elpa
+.emacs.d/places
+.emacs.d/projectile-bookmarks.eld
+.emacs.d/recentf
+.emacs.d/transient/
