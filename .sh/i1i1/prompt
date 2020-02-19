@@ -225,10 +225,8 @@ prompt_context() {
     fi
 }
 
-# prints history followed by HH:MM, useful for remembering what
-# we did previously
-prompt_histdt() {
-    prompt_segment black default "\! [\A]"
+prompt_time() {
+    prompt_segment orange black "\A"
 }
 
 
@@ -392,7 +390,7 @@ prompt_emacsdir() {
 build_prompt() {
     [[ ! -z ${AG_EMACS_DIR+x} ]] && prompt_emacsdir
     prompt_status
-    #[[ -z ${AG_NO_HIST+x} ]] && prompt_histdt
+    prompt_time
     [[ -z ${AG_NO_CONTEXT+x} ]] && prompt_context
     prompt_virtualenv
     prompt_dir

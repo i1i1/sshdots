@@ -1,4 +1,6 @@
+.config/chromium
 .config/hydroxide
+.config/nu
 .emacs.d/auto-save-list/
 .emacs.d/config.el
 .emacs.d/elpa
