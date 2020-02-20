@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 spawn_agent() {
     [ -z "$SSH_AUTH_SOCK" ] && {
         eval `ssh-agent -s`
@@ -23,17 +24,18 @@ diff() {
 }
 
 ec() {
-    which emacs &>/dev/null && {
+    if which emacs &>/dev/null; then
         emacsclient -a "" -c $* &>/dev/null &
         disown
-    } || env vim $*
+    else
+        env vim $*
+    fi
 }
 
 git_() {
     [ $# != 0 ] && {
         case $1 in
-            cl*) ;&
-            pu*) spawn_agent ;;
+            cl*|pu*) spawn_agent ;;
         esac
     }
     XDG_CONFIG_HOME=$RCFG_DIR env git "$@"

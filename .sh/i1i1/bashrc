@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 appendpath () {
     case ":$PATH:" in
         *:"$1":*) ;;

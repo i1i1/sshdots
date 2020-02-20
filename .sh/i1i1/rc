@@ -1,28 +1,35 @@
+#!/usr/bin/env bash
 is_installed() {
     which $* &>/dev/null
 }
 get_os() {
     awk -F= '/^ID=/{print $2}' /etc/os-release
 }
-install_packet() {
+install_packets_os() {
+    install=0
+    for p in $*; do
+        is_installed $p && continue
+        install=1
+    done
+
+    [ $install = 0 ] && return
+
     case $(get_os) in
         arch)              sudo pacman -S --confirm $* ;;
         raspbian|debian|ubuntu) sudo apt install -y $* ;;
     esac
 }
-install_packets() {
+install_packets_special() {
     for p in $*; do
         is_installed $p && continue
-
-        type install_$p &>/dev/null && install_$p && continue
-        install_packet $p   
+        install_$p
     done
 }
 install_fzf() {
     is_installed fzf && return
 
     case $(get_os) in
-        arch)          install_packet fzf ;;
+        arch)          install_packets_os fzf ;;
         raspbian) ;;
         debian|ubuntu)
             [ $(uname -m) != x86_64 ] && return
@@ -38,7 +45,7 @@ install_ripgrep() {
     is_installed rg && return
 
     case $(get_os) in
-        arch)          install_packet ripgrep ;;
+        arch)          install_packets_os ripgrep ;;
         raspbian) ;;
         debian|ubuntu)
             [ $(uname -m) != x86_64 ] && return
@@ -55,7 +62,7 @@ install_exa() {
     is_installed exa && return
 
     case $(get_os) in
-        arch)          install_packet exa ;;
+        arch)          install_packets_os exa ;;
         raspbian) ;;
         debian|ubuntu)
             [ $(uname -m) != x86_64 ] && return
@@ -70,20 +77,18 @@ install_exa() {
     esac
 }
 
-# dependencies
-install_packets \
+install_packets_os \
     curl \
-    unzip 
-
-install_packets \
-    exa \
-    fortune \
-    fzf \
     git \
     nmap \
-    ripgrep \
     rsync \
-    sshfs
+    sshfs \
+    unzip
+
+install_packets_special \
+    exa \
+    fzf \
+    ripgrep
 
 export BASHDOTDIR=$RCFG_DIR
 exec bash --rcfile $RCFG_DIR/bashrc

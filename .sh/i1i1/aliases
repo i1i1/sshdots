@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 is_installed() {
     which $1 &>/dev/null
 }
@@ -23,7 +24,7 @@ else
 fi
 
 if is_installed exa; then
-    alias ls_=exa
+    alias ls_='exa --color-scale'
 else
     alias ls_='env ls'
 fi
