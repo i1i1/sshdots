@@ -48,7 +48,7 @@ func memory(     cmd) {
 }
 
 func time() {
-    return color(" ", "#5080f0")getln("date '+%H:%M'")
+    return color("", "#5080f0")getln("date '+%H:%M'")
 }
 
 func date() {

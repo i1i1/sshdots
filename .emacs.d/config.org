@@ -398,20 +398,15 @@ Which key is a package which shows possible ways to complete the sequence of com
 #+BEGIN_SRC emacs-lisp
   (use-package meghanada)
   (add-hook 'java-mode-hook
-			(lambda ()
-			  ;; meghanada-mode on
-			  (meghanada-mode t)
-			  (flycheck-mode +1)
-			  (setq c-basic-offset 2)
-			  ;; use code format
-			  (add-hook 'before-save-hook 'meghanada-code-beautify-before-save)))
-  (cond
-	 ((eq system-type 'windows-nt)
-	  (setq meghanada-java-path (expand-file-name "bin/java.exe" (getenv "JAVA_HOME")))
-	  (setq meghanada-maven-path "mvn.cmd"))
-	 (t
-	  (setq meghanada-java-path "java")
-	  (setq meghanada-maven-path "mvn")))
+            (lambda ()
+              ;; meghanada-mode on
+              (meghanada-mode t)
+              (flycheck-mode +1)
+              (setq c-basic-offset 2)
+              ;; use code format
+              (add-hook 'before-save-hook 'meghanada-code-beautify-before-save)))
+  (setq meghanada-java-path "java")
+  (setq meghanada-maven-path "mvn")
 #+END_SRC
 ** C headers
 #+BEGIN_SRC emacs-lisp
@@ -518,11 +513,20 @@ Which key is a package which shows possible ways to complete the sequence of com
 #+END_SRC
 ** Go lang
 #+BEGIN_SRC emacs-lisp
-    (use-package go-mode)
+  (use-package go-mode
+    :config
+	(setq gofmt-command "goimports")
+	(add-hook 'before-save-hook 'gofmt-before-save))
 #+END_SRC
 ** Vala lang
 #+BEGIN_SRC emacs-lisp
     (use-package vala-mode)
+#+END_SRC
+
+** Vala lang
+#+BEGIN_SRC emacs-lisp
+    (use-package fish-mode)
+    (use-package fish-completion)
 #+END_SRC
 
 ** Rust lang

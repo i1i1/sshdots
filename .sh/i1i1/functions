@@ -112,7 +112,7 @@ ssh() {
              bash --rcfile \$RCFG_DIR/rc"
     }
     copy_config() {
-        tar czf - -C ~ .sh/ | ssh $1 tar xzfC - '~'
+        tar czfh - -C ~ .sh/ | ssh $1 tar xzfC - '~'
     }
     color() {
         printf "\033[0;$1m"
