@@ -23,7 +23,7 @@ else
     alias grep_='env grep'
 fi
 
-if is_installed exa; then
+if is_installed exa && exa / &>/dev/null; then
     alias ls_='exa --color-scale'
 else
     alias ls_='env ls'

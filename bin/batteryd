@@ -3,12 +3,12 @@ alert_per=10
 state=high
 
 while sleep 1; do
-    per=$(acpi | tr -d ',' | cut -d' ' -f4 | tr -d %)
+    per=$(cat /sys/class/power_supply/*/capacity)
 
-    if [ $state = low -a $per -gt $alert_per ]; then
+    if [ $state = low && $per -gt $alert_per ]; then
         state=high
     elif [ $state = high -a $per -lt $alert_per ]; then
-        notify-send Low battery!
+        notify-send "Low battery!"
         state=low
     fi
 done

@@ -11,7 +11,9 @@ run_one() {
 }
 
 
-for i in firefox telegram-desktop thunderbird "hydroxide imap" "hydroxide smtp"; do
+for i in batteryd firefox telegram-desktop thunderbird \
+                  "hydroxide imap" "hydroxide smtp"; do
+
     run_one $i
 done
 

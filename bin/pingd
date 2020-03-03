@@ -3,7 +3,7 @@ int=no
 num=0
 
 while sleep 1; do
-    ping -c 4 1.1.1.1 2>&1 >/dev/null
+    ping -c 4 google.com 2>&1 >/dev/null
     res=$?
 
     if [ $res = 1 -a $int = yes ]; then
@@ -12,7 +12,7 @@ while sleep 1; do
             notify-send "No internet duuuuude!"
             int=no
         fi
-    elif [ $res = 0]; then
+    elif [ $res = 0 ]; then
         num=0
         if [ $int = no ]; then
             notify-send "Here it gooooes!"

@@ -28,10 +28,14 @@ func brightness() {
 }
 
 func wifi(     net, cmd) {
-    cmd="iw dev wlp3s0 link|awk '/SSID/{print $2}'"
+    cmd="nmcli d show wlp3s0|awk '/^GENERAL.CONNECTION/{print $2}'"
     net=getln(cmd)
-    if (net == "\"\"")
-        return ""
+    if (net == "\"\"") {
+        ret = getln("cat /tmp/last_wifi")
+        print "" > "/tmp/last_wifi"
+        return ret
+    }
+    print net > "/tmp/last_wifi"
     return color(" ", "#804040")net
 }
 

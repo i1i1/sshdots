@@ -388,11 +388,11 @@ Which key is a package which shows possible ways to complete the sequence of com
 ** Go lang
 #+BEGIN_SRC emacs-lisp
   (use-package company-go
-    :init
-    (setq company-go-begin-after-member-access t))
-  (add-hook 'go-mode-hook
-            (lambda ()
-              (add-to-list 'company-backends 'company-go)))
+	:init
+	(setq company-go-begin-after-member-access t))
+	(add-hook 'go-mode-hook
+	   (lambda ()
+		  (add-to-list 'company-backends 'company-go)))
 #+END_SRC
 ** Java
 #+BEGIN_SRC emacs-lisp
@@ -515,7 +515,6 @@ Which key is a package which shows possible ways to complete the sequence of com
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
     :config
-	(setq gofmt-command "goimports")
 	(add-hook 'before-save-hook 'gofmt-before-save))
 #+END_SRC
 ** Vala lang
@@ -523,7 +522,12 @@ Which key is a package which shows possible ways to complete the sequence of com
     (use-package vala-mode)
 #+END_SRC
 
-** Vala lang
+** Dockerfile
+#+BEGIN_SRC emacs-lisp
+    (use-package dockerfile-mode)
+#+END_SRC
+
+** Fish lang
 #+BEGIN_SRC emacs-lisp
     (use-package fish-mode)
     (use-package fish-completion)
