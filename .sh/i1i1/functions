@@ -82,6 +82,11 @@ lsssh() {
          /^$/{printf("% -20s%s@%s\n", host":", user, hostname)}' ~/.ssh/config
 }
 
+scp() {
+    spawn_agent
+    env scp $@
+}
+
 ssh() {
     is_new_ssh() {
         url=$(echo $1|awk -F@ '/@/{print $2;exit} {print}')
@@ -106,7 +111,7 @@ ssh() {
     }
     connect() {
         env ssh $1 -t \
-            "export RCFG=i1i1;
+            "export RCFG=$RCFG;
              export RCFG_DIR=\$HOME/.sh/\$RCFG/;
              export RCFG_EXT=1;
              bash --rcfile \$RCFG_DIR/rc"
@@ -153,4 +158,10 @@ ssh() {
     green "Done! Now loging in\n"
     connect $host
 }
-
+tmux() {
+    env tmux -c "
+export RCFG=$RCFG;
+export RCFG_DIR=\$HOME/.sh/\$RCFG/;
+export RCFG_EXT=1;
+bash --rcfile \$RCFG_DIR/rc"
+}

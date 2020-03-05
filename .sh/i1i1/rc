@@ -28,35 +28,26 @@ install_packets_special() {
 install_fzf() {
     is_installed fzf && return
 
-    case $(get_os) in
-        arch)          install_packets_os fzf ;;
-        raspbian) ;;
-        debian|ubuntu)
-            [ $(uname -m) != x86_64 ] && return
-            (
-                cd /usr/bin/
-                curl -L https://github.com/junegunn/fzf-bin/releases/download/0.20.0/fzf-0.20.0-linux_amd64.tgz | \
-                    sudo tar -xz -f -
-            )
-            ;;
-    esac
+    git clone --depth 1 https://github.com/junegunn/fzf.git /tmp/fzf
+    yes n | /tmp/fzf/install &>/dev/null
+    sudo cp /tmp/fzf/bin/fzf /usr/bin
+    sudo rm -r ~/.fzf.bash /tmp/fzf
 }
 install_ripgrep() {
     is_installed rg && return
 
-    case $(get_os) in
-        arch)          install_packets_os ripgrep ;;
-        raspbian) ;;
-        debian|ubuntu)
-            [ $(uname -m) != x86_64 ] && return
+    if [ $(uname -m) = x86_64 ]; then
+        URL=https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep-11.0.2-x86_64-unknown-linux-musl.tar.gz
+    else
+        URL=https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep-11.0.2-arm-unknown-linux-gnueabihf.tar.gz
+    fi
 
-            DEB=$(mktemp --suffix deb -u)
-            URL=https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
-            curl -o $DEB -L $URL
-            sudo dpkg -i $DEB
-            rm $DEB
-            ;;
-    esac
+    (
+        cd /tmp
+        wget -O - $URL | tar zxf -
+        sudo cp ripgrep-*/rg /usr/bin/
+        rm -r ripgrep-*/
+    )
 }
 install_exa() {
     is_installed exa && return

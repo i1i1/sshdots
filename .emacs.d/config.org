@@ -557,3 +557,9 @@ Which key is a package which shows possible ways to complete the sequence of com
 #+BEGIN_SRC emacs-lisp
   (setq gdb-show-main t)
 #+END_SRC
+** Dot lang
+#+BEGIN_SRC emacs-lisp
+  (use-package dot-mode)
+  (use-package graphviz-dot-mode)
+#+END_SRC
+

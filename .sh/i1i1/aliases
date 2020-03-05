@@ -29,3 +29,7 @@ else
     alias ls_='env ls'
 fi
 
+__git_complete g __git_main
+complete -F _docker dc
+complete -F _docker_compose dcc
+
