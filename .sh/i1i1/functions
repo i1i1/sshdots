@@ -1,15 +1,4 @@
 #!/usr/bin/env bash
-spawn_agent() {
-    [ -z "$SSH_AUTH_SOCK" ] && {
-        eval `ssh-agent -s`
-        ssh-add
-    }
-}
-
-c() {
-    cd $(fd -t d . ~ | sed "s!^$HOME!~!" | fzf | sed "s!^~!$HOME!")
-}
-
 diff() {
     tmppipe=$(mktemp)
     chmod 600 $tmppipe
@@ -23,7 +12,7 @@ diff() {
     return $ret
 }
 
-ec() {
+edit() {
     if which emacs &>/dev/null; then
         emacsclient -a "" -c $* &>/dev/null &
         disown
@@ -33,11 +22,6 @@ ec() {
 }
 
 git_() {
-    [ $# != 0 ] && {
-        case $1 in
-            cl*|pu*) spawn_agent ;;
-        esac
-    }
     XDG_CONFIG_HOME=$RCFG_DIR env git "$@"
 }
 
@@ -82,11 +66,6 @@ lsssh() {
          /^$/{printf("% -20s%s@%s\n", host":", user, hostname)}' ~/.ssh/config
 }
 
-scp() {
-    spawn_agent
-    env scp $@
-}
-
 ssh() {
     is_new_ssh() {
         url=$(echo $1|awk -F@ '/@/{print $2;exit} {print}')
@@ -117,7 +96,7 @@ ssh() {
              bash --rcfile \$RCFG_DIR/rc"
     }
     copy_config() {
-        tar czfh - -C ~ .sh/ | ssh $1 tar xzfC - '~'
+        tar cfh - -C ~ .sh/ | ssh $1 tar xfC - '~'
     }
     color() {
         printf "\033[0;$1m"
@@ -135,8 +114,6 @@ ssh() {
         color 33 "$@"
     }
 
-
-    spawn_agent
 
     [ $# != 1 ] && env ssh $@ && return $?
     host=$1
@@ -157,11 +134,4 @@ ssh() {
 
     green "Done! Now loging in\n"
     connect $host
-}
-tmux() {
-    env tmux -c "
-export RCFG=$RCFG;
-export RCFG_DIR=\$HOME/.sh/\$RCFG/;
-export RCFG_EXT=1;
-bash --rcfile \$RCFG_DIR/rc"
 }

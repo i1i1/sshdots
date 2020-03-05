@@ -40,3 +40,12 @@ for file in "${TO_SOURCE[@]}"; do
     source $file
 done
 
+if [ ! -z "$RCFG_EXT" ]; then
+    q=q
+else
+    q=a
+fi
+
+tmux set -g prefix C-$q
+tmux bind C-$q send-prefix
+tmux unbind C-$q

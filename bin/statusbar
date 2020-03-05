@@ -12,12 +12,14 @@ func getln(cmd,     tmp) {
 }
 
 func color(s, clr) {
+#   return "<span foreground=\""clr"\">"s"</span>"
     return s
-#     return "<span foreground=\""clr"\">"s"</span>"
 }
 
 func sound() {
-    return color(" ", "#007000")getln("mixer|grep vol|cut -d':' -f2")"%"
+    mute = getln("pactl list sinks|awk '/Mute/{print $2}'") == "yes"
+    volume = getln("pactl list sinks|awk '/\tVolume:/{print $5}'")
+    return mute ? color("", "#007000") : color(" ", "#007000") volume
 }
 
 func brightness() {
@@ -65,10 +67,7 @@ func battery(     clr, per, state, rem) {
     per =   getln("acpi|tr -d ','|cut -d' ' -f4")
     rem =   getln("acpi|tr -d ','|cut -d' ' -f5")
 
-    if (state == "Discharging")
-        return clr per " "  rem
-    else
-        return clr per "+ " rem
+    return state == "Discharging" ? clr per " "  rem : clr per "+ " rem
 }
 
 func layout() {
@@ -82,9 +81,9 @@ func main() {
     a=a s cpu()
     a=a s memory()
     a=a s wifi()
-    # a=a s sound()
+    a=a s sound()
     a=a s brightness()
     a=a s battery()
     a=a s layout()
-    print " "a" "
+    print " "a
 }

@@ -15,7 +15,8 @@ alias less='less -R'
 alias ll='ls -l'
 alias ls='ls_ --color=auto'
 alias vi=vim
-alias vim=ec
+alias ec=vim
+alias vim=edit
 
 if is_installed rg; then
     alias grep_=rg

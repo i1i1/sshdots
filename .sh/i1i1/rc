@@ -54,7 +54,6 @@ install_exa() {
 
     case $(get_os) in
         arch)          install_packets_os exa ;;
-        raspbian) ;;
         debian|ubuntu)
             [ $(uname -m) != x86_64 ] && return
 
@@ -74,6 +73,7 @@ install_packets_os \
     nmap \
     rsync \
     sshfs \
+    tmux \
     unzip
 
 install_packets_special \
@@ -82,4 +82,9 @@ install_packets_special \
     ripgrep
 
 export BASHDOTDIR=$RCFG_DIR
-exec bash --rcfile $RCFG_DIR/bashrc
+
+if [ -z "$LOGIN_SHELL" ]; then
+    exec tmux -f $BASHDOTDIR/tmux.conf
+else
+    exec bash --rcfile $RCFG_DIR/bashrc
+fi

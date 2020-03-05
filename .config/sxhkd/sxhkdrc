@@ -6,3 +6,5 @@ super + shift + u
     dumount
 super + shift + m
     drandr
+super + v
+    pactl set-sink-mute @DEFAULT_SINK@ toggle
