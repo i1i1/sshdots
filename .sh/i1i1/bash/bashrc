@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+have() {
+    unset -v have
+    # Completions for system administrator commands are installed as well in
+    # case completion is attempted via `sudo command ...'.
+    type $1 &>/dev/null &&
+    have="yes"
+}
+
+TO_SOURCE=( $BASHDOTDIR/autocompletion/* $BASHDOTDIR/prompt )
+if [ -r /etc/bash_completion ]; then
+    TO_SOURCE=( ${TO_SOURCE[@]} /etc/bash_completion )
+else
+    TO_SOURCE=( ${TO_SOURCE[@]} /usr/share/bash-completion/*/* )
+fi
+if ! (which fzf &>/dev/null && fzf -h &>/dev/null); then
+    TO_SOURCE=( $(echo ${TO_SOURCE[@]} | tr ' ' '\n' | grep -v fzf) )
+fi
+TO_SOURCE=( ${TO_SOURCE[@]} $RCFG_DIR/{aliases,functions,variables} )
+
+for file in "${TO_SOURCE[@]}"; do
+    source $file
+done
+
+__git_complete g __git_main
+complete -F _docker dc
+complete -F _docker_compose dcc

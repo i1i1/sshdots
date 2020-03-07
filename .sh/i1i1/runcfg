@@ -1,0 +1,24 @@
+run_bash() {
+    export BASHDOTDIR=$RCFG_DIR/bash/
+    . $BASHDOTDIR/bashrc
+}
+run_zsh() {
+    export ZDOTDIR=$RCFG_DIR/zsh/
+    zsh
+}
+
+[ ! -z "$TMUX" ] && {
+    # Setuping TMUX
+    if [ ! -z "$RCFG_EXT" ]; then
+        q=q
+    else
+        q=a
+    fi
+
+    tmux set -g prefix C-$q
+    tmux bind C-$q send-prefix
+    tmux unbind C-$q
+}
+
+run_zsh
+#run_bash

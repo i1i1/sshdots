@@ -1,0 +1,12 @@
+export ZSH="$ZDOTDIR/ohmyzsh"
+export UPDATE_ZSH_DAYS=7
+export ENABLE_CORRECTION=true
+export COMPLETION_WAITING_DOTS=true
+export plugins=(git fzf)
+
+
+[ ! -d "$ZSH" ] && git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh "$ZSH"
+
+for src in $ZSH/oh-my-zsh.sh $ZDOTDIR/prompt $RCFG_DIR/{aliases,functions,variables}; do
+    source $src
+done

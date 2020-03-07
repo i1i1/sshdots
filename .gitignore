@@ -12,10 +12,12 @@
 .emacs.d/auto-save-list/
 .emacs.d/config.el
 .emacs.d/elpa
+.emacs.d/init.el
 .emacs.d/places
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/recentf
 .emacs.d/smex-items
 .emacs.d/transient/
-.emacs.d/init.el
+.sh/i1i1/zsh/.zcompdump*
+.sh/i1i1/zsh/ohmyzsh
 \#*
