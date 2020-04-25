@@ -7,6 +7,6 @@ export plugins=(git fzf)
 
 [ ! -d "$ZSH" ] && git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh "$ZSH"
 
-for src in $ZSH/oh-my-zsh.sh $ZDOTDIR/prompt $RCFG_DIR/{aliases,functions,variables}; do
+for src in $ZSH/oh-my-zsh.sh $ZDOTDIR/prompt $RCFG_DIR/{functions,variables}; do
     source $src
 done

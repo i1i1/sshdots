@@ -1,10 +1,4 @@
 #!/usr/bin/gawk -f
-BEGIN {
-    s=" "
-    main()
-    exit(0)
-}
-
 func getln(cmd,     tmp) {
     cmd | getline tmp
     close(cmd)
@@ -17,21 +11,24 @@ func color(s, clr) {
 }
 
 func sound() {
-    mute = getln("pactl list sinks|awk '/Mute/{print $2}'") == "yes"
-    volume = getln("pactl list sinks|awk '/\tVolume:/{print $5}'")
-    return mute ? color("", "#007000") : color(" ", "#007000") volume
-}
+    sink_name   = getln("pacmd info | awk '/Default sink/{print $4}'")
+    sink_number = getln("pacmd info | awk '/sink:.*"sink_name"/ {print $2}'")
 
-func brightness() {
-    cur = getln("cat /sys/class/backlight/intel_backlight/brightness")
-    max = getln("cat /sys/class/backlight/intel_backlight/max_brightness")
-    per = sprintf("%d", cur * 100 / max)
-    return color(" ", "#007070")per"%"
+    sink = "pactl list sinks|awk '/Sink #"sink_number"/{p=1;next} /Sink #/{p=0} p==1{print}'"
+
+    mute = getln(sink"|awk '/Mute/{print $2}'") == "yes"
+    name = getln(sink"|awk '/Description:/{print $2}'")
+
+    icon = (mute ? color(" ", "#007000") : color(" ", "#007000"))
+
+    return icon name
 }
 
 func wifi(     net, cmd) {
-    cmd="nmcli d show wlp3s0|awk '/^GENERAL.CONNECTION/{print $2}'"
+    cmd="nmcli d show wlp3s0|grep ^GENERAL.CONNECTION|cut -d: -f2"
     net=getln(cmd)
+    sub(/^ */, "", net)
+    sub(/ *$/, "", net)
     if (net == "\"\"") {
         ret = getln("cat /tmp/last_wifi")
         print "" > "/tmp/last_wifi"
@@ -67,7 +64,7 @@ func battery(     clr, per, state, rem) {
     per =   getln("acpi|tr -d ','|cut -d' ' -f4")
     rem =   getln("acpi|tr -d ','|cut -d' ' -f5")
 
-    return state == "Discharging" ? clr per " "  rem : clr per "+ " rem
+    return state == "Discharging" ? clr per " "  rem : clr per "+" rem
 }
 
 func layout() {
@@ -75,15 +72,38 @@ func layout() {
     return l == 1000 ? "ru" : "en"
 }
 
-func main() {
-    a=    time()
-    a=a s date()
-    a=a s cpu()
-    a=a s memory()
-    a=a s wifi()
-    a=a s sound()
-    a=a s brightness()
-    a=a s battery()
-    a=a s layout()
-    print " "a
+func tempreture() {
+    icon = color(" ", "#80a050")
+    return icon getln("sed -n ~/.cache/wttr \
+        -e 's/\x1b\\[[0-9;]*m//g' \
+        -e 's/^.* \\([^ ]*\\) °C/\\1/' \
+        -e 's/ *$//' \
+        -e 4p \
+    ")
+}
+
+func rain() {
+    icon = color(" ", "#80a050")
+    cmd = "sed -n 16p ~/.cache/wttr | tr ' ' '\n' | grep % | tr -d %"
+    while (cmd | getline ln > 0) {
+        n++
+        per += ln
+    }
+    close(cmd)
+    return icon sprintf("%d", per/n) "%"
+}
+
+BEGIN {
+    s=" "
+    print \
+        s time() \
+        s date() \
+        s cpu() \
+        s memory() \
+        s tempreture() \
+        s rain() \
+        s wifi() \
+        s sound() \
+        s battery() \
+        s layout()
 }

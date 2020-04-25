@@ -1,0 +1,30 @@
+#!/bin/sh
+ask() { dmenu -i -l 6 -fn Go-Mono -p "$1" ; }
+get_paired_names() { bluetoothctl -- paired-devices | sed 's/^Device \(..:\)\+.. //' ; }
+get_rssi()         { bluetoothctl -- paired-devices | grep -F "$1" | cut -d' ' -f2; }
+pair_dev_rssi() {
+    bluetoothctl           -- agent on
+    bluetoothctl           -- default-agent
+    timeout 3 bluetoothctl -- scan on
+
+	rssi=$(
+		bluetoothctl -- devices |
+			sed 's/Device //' |
+			sort -h |
+			ask "Pair with:" |
+			cut -d' ' -f 1
+	)
+	bluetoothctl -- pair    $rssi
+	bluetoothctl -- connect $rssi
+	bluetoothctl -- trust   $rssi
+}
+
+set -e
+bluetoothctl -- power on &>/dev/null
+dev="$((echo Disconnect; get_paired_names; echo Pair) | ask 'Connect to:')"
+
+case "$dev" in
+    Disconnect) bluetoothctl -- disconnect;;
+    Pair)       pair_dev_rssi ;;
+    *)          bluetoothctl -- connect $(get_rssi "$dev")
+esac

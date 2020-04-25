@@ -1,0 +1,12 @@
+#!/bin/sh
+cachedir=~/.cache/clipboard/
+n=1
+
+mkdir -p $cachedir
+rm -rf $cachedir/*
+xclip -out -selection clipboard > $cachedir/0000
+
+while clipnotify; do
+    xclip -out -selection clipboard > $cachedir/$(printf '%04d' $n)
+    n=$((n+1))
+done

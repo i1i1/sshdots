@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 bash $RCFG_DIR/install_deps
+exec bash --rcfile ~/.sh/i1i1/runcfg
 
-if [ -z "$LOGIN_SHELL" ]; then
-    exec tmux -f $RCFG_DIR/tmux.conf
+if [ "$RCFG_EXT" ]; then
+    exec tmux -f $RCFG_DIR/tmux/tmux.conf
 else
     exec bash --rcfile ~/.sh/i1i1/runcfg
 fi

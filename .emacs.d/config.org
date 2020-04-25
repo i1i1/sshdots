@@ -39,11 +39,17 @@ Setting default shell inside emacs to Bash
   (if bg-color-dark
     (load-theme 'solarized-dark t)
     (load-theme 'solarized-light t))
-
 #+END_SRC
 ** Font, lines and linespace
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(font . "Go Mono-8"))
+  (custom-set-faces
+   '(default ((t (:stipple nil
+                           :height 80
+                           :weight normal
+                           :width normal
+                           :family "Go Mono"
+                           )))))
+  ;(add-to-list 'default-frame-alist '(font . "Go Mono-8"))
   (setq-default line-spacing 10)
   (global-linum-mode t)
 
@@ -330,7 +336,8 @@ Which key is a package which shows possible ways to complete the sequence of com
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
 	:config
-	(add-hook 'prog-mode-hook 'flycheck-mode))
+	;(add-hook 'prog-mode-hook 'flycheck-mode)
+  )
   (use-package quick-peek)
   (use-package flycheck-inline
 	:after flycheck
@@ -561,5 +568,17 @@ Which key is a package which shows possible ways to complete the sequence of com
 #+BEGIN_SRC emacs-lisp
   (use-package dot-mode)
   (use-package graphviz-dot-mode)
+#+END_SRC
+** Ansi colors
+#+BEGIN_SRC emacs-lisp
+(require 'ansi-color)
+(defun display-ansi-colors ()
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
+#+END_SRC
+
+** Ansi colors
+#+BEGIN_SRC emacs-lisp
+  (require 'floobits)
 #+END_SRC
 

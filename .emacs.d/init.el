@@ -20,3 +20,17 @@
 
 (use-package ob-async)
 (org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+	(floobits docker-compose-mode graphviz-dot-mode zzz-to-char yasnippet-snippets yaml-mode which-key vala-mode use-package sudo-edit spaceline solarized-theme smex rainbow-mode rainbow-delimiters racer quick-peek projectile paredit org-bullets ob-async neotree meson-mode meghanada markdown-mode linum-relative ido-vertical-mode hungry-delete flycheck-rust flycheck-popup-tip flycheck-irony flycheck-inline fish-mode fish-completion evil-magit ein ediprolog dot-mode dockerfile-mode diminish dashboard counsel company-quickhelp company-jedi company-irony company-go company-c-headers cider better-defaults beacon))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:stipple nil :height 80 :weight normal :width normal :family "Go Mono")))))

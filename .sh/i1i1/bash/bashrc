@@ -16,7 +16,7 @@ fi
 if ! (which fzf &>/dev/null && fzf -h &>/dev/null); then
     TO_SOURCE=( $(echo ${TO_SOURCE[@]} | tr ' ' '\n' | grep -v fzf) )
 fi
-TO_SOURCE=( ${TO_SOURCE[@]} $RCFG_DIR/{aliases,functions,variables} )
+TO_SOURCE=( ${TO_SOURCE[@]} $RCFG_DIR/{functions,variables} )
 
 for file in "${TO_SOURCE[@]}"; do
     source $file

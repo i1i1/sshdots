@@ -1,2 +1,2 @@
 #!/bin/sh
-wget -O - https://unsplash.it/2560/1440/?random | feh --bg-scale -
+wget -qO - https://unsplash.it/2560/1440/?random | feh --bg-scale -

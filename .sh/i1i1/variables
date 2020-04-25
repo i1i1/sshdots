@@ -12,8 +12,11 @@ for p in /sbin /usr/local/go/bin /usr/local/bin /usr/local/sbin \
 done
 
 export DEFAULT_USER=i1i1
+export EDITOR=edit
 export GIT_CONFIG=$RCFG_DIR/gitconfig
+export IFS=$'\n'
 export LC_ALL=en_US.utf8
 export TERM=xterm-256color
+export TODO_DIR=$HOME/.config/todotxt
 
 eval `dircolors $RCFG_DIR/dircolors`

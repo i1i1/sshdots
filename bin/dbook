@@ -1,0 +1,7 @@
+#!/bin/sh
+cd ~/Download/
+pdf="$(ls -t . 'Telegram Desktop' |
+    grep pdf$ |
+    dmenu -p 'Which book to open:' -l 10)"
+
+[ ! -z "$pdf" ] && zathura "$pdf"

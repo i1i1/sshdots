@@ -21,10 +21,6 @@ edit() {
     fi
 }
 
-git_() {
-    XDG_CONFIG_HOME=$RCFG_DIR env git "$@"
-}
-
 lsips() {
     sudo true # just asking for sudo to make output look synchronous
 
@@ -95,25 +91,16 @@ ssh() {
              export RCFG_EXT=1;
              bash --rcfile \$RCFG_DIR/rc"
     }
-    copy_config() {
-        tar cfh - -C ~ .sh/ | ssh $1 tar xfC - '~'
-    }
+    copy_config() { tar cfh - -C ~ .sh/ | ssh $1 tar xfC - '~'; }
     color() {
         printf "\033[0;$1m"
         shift 1
         printf "$@"
         printf '\033[0m'
     }
-    red() {
-        color 31 "$@"
-    }
-    green() {
-        color 32 "$@"
-    }
-    yellow() {
-        color 33 "$@"
-    }
-
+    red()    { color 31 "$@" ; }
+    green()  { color 32 "$@" ; }
+    yellow() { color 33 "$@" ; }
 
     [ $# != 1 ] && env ssh $@ && return $?
     host=$1
@@ -135,3 +122,65 @@ ssh() {
     green "Done! Now loging in\n"
     connect $host
 }
+
+_gcloud_create() {
+    PROJECT=$1
+    MACHINE_TYPE=$2
+    DISK_SIZE=$3
+    MACHINE_NAME=$5
+    if [ "$4" = true ]; then
+        FLAG=--google-preemptible
+    fi
+
+    docker-machine ls -q | grep ^"$MACHINE_NAME"$ || {
+        docker-machine create \
+                       --driver google \
+                       $FLAG \
+                       --google-disk-size $DISK_SIZE \
+                       --google-machine-type $MACHINE_TYPE \
+                       --google-project $PROJECT \
+                       --google-zone europe-north1-b \
+                       $MACHINE_NAME
+    }
+
+    eval $(docker-machine env $MACHINE_NAME)
+}
+
+dcm_work() { _gcloud_create copper-tracker-270409 n1-standard-16 35 false i1i1; }
+
+unalias g grep ls l la ll "..." "...."
+
+..()   { cd ..;   }
+...()  { ..;  ..; }
+....() { ...; ..; }
+ca()   { cargo "$@"; }
+dc()   { docker "$@"; }
+dcc()  { docker-compose "$@"; }
+dcm()  { docker-machine "$@"; }
+ec()   { edit "$@"; }
+g()    { git "$@"; }
+git()  { git_ "$@"; }
+git_() { XDG_CONFIG_HOME=$RCFG_DIR env git "$@"; }
+grep() { env grep --color=auto "$@"; }
+l()    { ls "$@"; }
+la()   { ll -a "$@"; }
+less() { env less -R "$@"; }
+ll()   { ls -l "$@"; }
+ls()   { ls_ --color=auto "$@"; }
+ls_()  { exa / &>/dev/null && exa --color-scale "$@" || env ls "$@"; }
+ls_()  { exa / &>/dev/null && exa --color-scale "$@" || env ls "$@"; }
+rg()   { env rg --color=auto "$@"; }
+t()    { todotxt-machine $TODO_DIR/todo.txt $TODO_DIR/archive.txt;  }
+vi()   { vim "$@"; }
+vim()  { edit "$@"; }
+wttr() { cat ~/.cache/wttr; }
+
+#
+# In order to make parallel loops like this:
+#
+#   for ar in *.tar; pdo
+#       tar xf $ar
+#   pdone
+#
+alias pdo='do while [ $(jobs | wc -l) = 8 ]; do sleep 0.01; done; ('
+alias pdone=') & done; wait'

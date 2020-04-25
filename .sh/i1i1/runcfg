@@ -5,20 +5,15 @@ run_bash() {
 run_zsh() {
     export ZDOTDIR=$RCFG_DIR/zsh/
     zsh
+    exit $?
 }
 
-[ ! -z "$TMUX" ] && {
-    # Setuping TMUX
-    if [ ! -z "$RCFG_EXT" ]; then
-        q=q
-    else
-        q=a
-    fi
-
-    tmux set -g prefix C-$q
-    tmux bind C-$q send-prefix
-    tmux unbind C-$q
+cd ~
+[ -f ~/.cache/wttr ] && {
+    cat ~/.cache/wttr | head -7
+    echo
 }
 
 run_zsh
 #run_bash
+

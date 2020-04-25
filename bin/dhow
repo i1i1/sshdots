@@ -1,0 +1,30 @@
+#!/bin/sh
+lang_ext() {
+    case $1 in
+        rust)           echo rs         ;;
+        bash)           echo sh         ;;
+        c++)            echo cpp        ;;
+        docker)         echo Dockerfile ;;
+        docker-compose) echo yml        ;;
+        *)              echo $1         ;;
+    esac
+}
+
+how_in() {
+	where=$1
+    lang=$(lang_ext $where)
+    shift 1
+
+	name="$where:$*.$lang"
+    file="$cachedir/$name"
+
+	[ ! -f "$file" ] && curl "cheat.sh/$where/$*?qT" > "$file"
+    edit "$file"
+}
+
+set -e
+
+cachedir=~/.cache/how/
+mkdir -p $cachedir
+
+how_in $(ls -t $cachedir | cut -d. -f1 | tr ":" " " | dmenu -p "How in:" -l 10)

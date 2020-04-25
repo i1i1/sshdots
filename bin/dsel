@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+getentries() {
+    for ent in $(ls -r $cachedir); do
+        echo "$ent | $(head -1 $cachedir/$ent)"
+    done
+}
+cachedir=~/.cache/clipboard/
+fname=$cachedir/$(getentries | dmenu -p 'Copy:' -l 5 | cut -d'|' -f1)
+
+head -c-1 $fname | xclip -in -selection clipboard
+notify-send "Copied"

@@ -15,8 +15,8 @@ install_packets_os() {
     [ $install = 0 ] && return
 
     case $(get_os) in
-        arch)              sudo pacman -S --confirm $* ;;
-        raspbian|debian|ubuntu) sudo apt install -y $* ;;
+        arch)                   pacman -S --confirm $* ;;
+        raspbian|debian|ubuntu) apt install -y $* ;;
     esac
 }
 install_packets_special() {
@@ -30,8 +30,8 @@ install_fzf() {
 
     git clone --depth 1 https://github.com/junegunn/fzf.git /tmp/fzf
     yes n | /tmp/fzf/install &>/dev/null
-    sudo cp /tmp/fzf/bin/fzf /usr/bin
-    sudo rm -r ~/.fzf.bash /tmp/fzf
+    cp /tmp/fzf/bin/fzf /usr/bin
+    rm -r ~/.fzf.bash /tmp/fzf
 }
 install_ripgrep() {
     is_installed rg && return
@@ -45,7 +45,7 @@ install_ripgrep() {
     (
         cd /tmp
         wget -O - $URL | tar zxf -
-        sudo cp ripgrep-*/rg /usr/bin/
+        cp ripgrep-*/rg /usr/bin/
         rm -r ripgrep-*/
     )
 }
@@ -61,12 +61,11 @@ install_exa() {
             URL=https://github.com/ogham/exa/releases/download/v0.9.0/exa-linux-x86_64-0.9.0.zip
             curl -o $ZIP -L $URL
             unzip $ZIP
-            sudo mv exa* /usr/bin/exa
+            mv exa* /usr/bin/exa
             rm $ZIP
             ;;
     esac
 }
-
 
 install_packets_os \
     curl \
@@ -75,9 +74,15 @@ install_packets_os \
     rsync \
     sshfs \
     tmux \
-    unzip
+    unzip \
+    zip \
+    zsh
 
 install_packets_special \
     exa \
     fzf \
     ripgrep
+
+[ -d ~/.sh/i1i1/tmux/sidebar ] || \
+    git clone --depth 1 https://github.com/tmux-plugins/tmux-sidebar \
+        ~/.sh/i1i1/tmux/sidebar

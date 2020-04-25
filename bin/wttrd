@@ -1,0 +1,5 @@
+#!/bin/sh
+while :; do
+    curl https://wttr.in/~Innopolis > ~/.cache/wttr
+    sleep 1h
+done

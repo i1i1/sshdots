@@ -1,0 +1,33 @@
+#!/bin/sh
+rerun() {
+    killall -9 "$1" 2>&1 >/dev/null
+    "$@" &
+}
+
+run_one() {
+	if ! pgrep "$1" 2>&1 >/dev/null; then
+		"$@" &
+	fi
+}
+
+ls_run_one() {
+    cat <<EOF
+batteryd
+firefox
+hydroxide imap
+hydroxide smtp
+telegram-desktop
+thunderbird
+wttrd
+EOF
+}
+
+unsplash
+
+ls_run_one | while read cmd; do
+    run_one $cmd
+done
+
+for i in usbd pingd dunst seld sxhkd; do
+    rerun $i
+done

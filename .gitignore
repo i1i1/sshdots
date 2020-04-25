@@ -1,5 +1,10 @@
 .\#*
+\#*
+.config/gcloud/
+.config/lxqt/
+.config/menus/
 .config/QtProject.conf
+.config/qBittorrent/
 .config/chromium
 .config/dconf/
 .config/enchant/
@@ -20,4 +25,4 @@
 .emacs.d/transient/
 .sh/i1i1/zsh/.zcompdump*
 .sh/i1i1/zsh/ohmyzsh
-\#*
+.vim*

@@ -7,4 +7,24 @@ super + shift + u
 super + shift + m
     drandr
 super + v
-    pactl set-sink-mute @DEFAULT_SINK@ toggle
+    volume toggle
+super + bracketleft
+    volume -10%
+super + bracketright
+    volume +10%
+super + braceleft
+    xbacklight -dec 10 && notify-send "$(printf 'Brightness %.0f%%\n' $(xbacklight))"
+super + braceright
+    xbacklight -inc 10 && notify-send "$(printf 'Brightness %.0f%%\n' $(xbacklight))"
+super + e
+    dseledit
+super + c
+    dsel
+super + b
+    dbluet
+super + shift + b
+    dbook
+super + s
+    dscreenshot
+super + x
+    dhow

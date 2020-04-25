@@ -15,5 +15,5 @@
     di = diff
     hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
     last = log -1 HEAD
-    st = status
+    st = status -sb
     pu = push

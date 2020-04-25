@@ -1,0 +1,24 @@
+#!/bin/sh
+sink_name=$(pacmd info | grep 'Default sink' | awk '{print $4}')
+sink_number=$(pacmd info | grep "sink:.*$sinkName" | awk '{print $2}')
+
+getprops() {
+    pactl list sinks | awk "
+        /Sink #$sink_number/ { p = 1; next}
+        /Sink #/             { p = 0 }
+        p == 1               { print }
+    "
+}
+
+getvolume() { getprops | awk '/Volume: front/ {print $5}'; }
+ismute()    { [ $(getprops | awk '/Mute:/ {print $2}') = "yes" ]; }
+
+[ $# != 1 ] && exit 1
+
+if [ "$1" = toggle ]; then
+    pactl set-sink-mute @DEFAULT_SINK@ toggle
+else
+    pactl set-sink-volume @DEFAULT_SINK@ $1
+fi
+
+notify-send "$(ismute && echo 'M ')Volume $(getvolume)"

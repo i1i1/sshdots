@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+scrot -soq 100 ~/.cache/screenshot.png
+name="$(echo -n | dmenu -p 'Enter name for screenshot:')"
+cp ~/.cache/screenshot.png ~/Images/"$name".png

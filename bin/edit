@@ -1,0 +1,12 @@
+#!/bin/sh
+[ "$1" = _not_disown_ ] && {
+    shift 1
+    FLAG=1
+}
+
+if which emacs &>/dev/null; then
+    emacsclient -a "" -c "$*" &>/dev/null &
+    [ -z "$FLAG" ] && disown || wait
+else
+    env vim "$*"
+fi
