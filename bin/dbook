@@ -1,7 +1,11 @@
 #!/bin/sh
 cd ~/Download/
-pdf="$(ls -t . 'Telegram Desktop' |
-    grep pdf$ |
-    dmenu -p 'Which book to open:' -l 10)"
+pdf="$(
+    stat -c '%Y %n' * 'Telegram Desktop'/* |
+        sort -rk1 |
+        sed 's/^[^ ]* //' |
+        grep pdf$ |
+        dmenu -i -l 10 -p 'Which book to open:'
+)"
 
 [ ! -z "$pdf" ] && zathura "$pdf"

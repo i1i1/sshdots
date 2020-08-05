@@ -1,12 +1,20 @@
 export ZSH="$ZDOTDIR/ohmyzsh"
+export ZSH_DISABLE_COMPFIX=true
 export UPDATE_ZSH_DAYS=7
-export ENABLE_CORRECTION=true
-export COMPLETION_WAITING_DOTS=true
-export plugins=(git fzf)
+export DISABLE_UPDATE_PROMPT=true
+export COMPLETION_WAITING_DOTS=false
+export plugins=(git fzf fzf-tab docker docker-compose docker-machine)
 
 
 [ ! -d "$ZSH" ] && git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh "$ZSH"
+[ ! -d "$ZSH/plugins/fzf-tab" ] && \
+    git clone --depth=1 https://github.com/Aloxaf/fzf-tab "$ZSH/plugins/fzf-tab"
 
 for src in $ZSH/oh-my-zsh.sh $ZDOTDIR/prompt $RCFG_DIR/{functions,variables}; do
     source $src
 done
+
+compdef _git g
+compdef _docker dc
+compdef _docker-compose dcc
+compdef _docker-machine dcm

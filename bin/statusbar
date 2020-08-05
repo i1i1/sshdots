@@ -1,20 +1,22 @@
 #!/usr/bin/gawk -f
-func getln(cmd,     tmp) {
+function getln(cmd,     tmp) {
     cmd | getline tmp
     close(cmd)
     return tmp
 }
 
-func color(s, clr) {
 #   return "<span foreground=\""clr"\">"s"</span>"
-    return s
-}
+function color(s, clr) { return s }
 
-func sound() {
-    sink_name   = getln("pacmd info | awk '/Default sink/{print $4}'")
-    sink_number = getln("pacmd info | awk '/sink:.*"sink_name"/ {print $2}'")
 
-    sink = "pactl list sinks|awk '/Sink #"sink_number"/{p=1;next} /Sink #/{p=0} p==1{print}'"
+function time() { return color(" ", "#5080f0")getln("date '+%H:%M:%S'") }
+function date() { return color(" ", "#5050a0")getln("date '+%b %d'") }
+
+function sound() {
+    sname = getln("pacmd info | grep 'Default sink' | cut -d: -f2")
+    snum  = getln("pacmd info | awk '/sink:.*"sname"/ {print $2}'")
+
+    sink = "pactl list sinks | awk '/Sink #"snum"/{p=1;next} /Sink #/{p=0} p==1{print}'"
 
     mute = getln(sink"|awk '/Mute/{print $2}'") == "yes"
     name = getln(sink"|awk '/Description:/{print $2}'")
@@ -24,7 +26,7 @@ func sound() {
     return icon name
 }
 
-func wifi(     net, cmd) {
+function wifi(     net, cmd) {
     cmd="nmcli d show wlp3s0|grep ^GENERAL.CONNECTION|cut -d: -f2"
     net=getln(cmd)
     sub(/^ */, "", net)
@@ -38,41 +40,32 @@ func wifi(     net, cmd) {
     return color(" ", "#804040")net
 }
 
-func cpu(     usage, ncpu, res) {
+function cpu(     usage, ncpu, res) {
     ncpu=getln("cat /proc/cpuinfo|grep proce|wc -l")
     usage=getln("ps -Ao %cpu|awk '{a+=$1}END{print a}'")
     res=sprintf("%d%%", usage/ncpu)
     return color(" ", "#8050a0")res
 }
 
-func memory(     cmd) {
+function memory(     cmd) {
     cmd="free |awk '/Mem/{printf(\"%d%%\", 100 - $7*100/$2)}'"
     return color(" ", "#a06540")getln(cmd)
 }
 
-func time() {
-    return color("", "#5080f0")getln("date '+%H:%M'")
-}
-
-func date() {
-    return color(" ", "#5050a0")getln("date '+%b %d'")
-}
-
-func battery(     clr, per, state, rem) {
+function battery(     clr, per, state, rem) {
     clr = color(" ", "#80a050")
     state = getln("acpi|tr -d ','|cut -d' ' -f3")
     per =   getln("acpi|tr -d ','|cut -d' ' -f4")
     rem =   getln("acpi|tr -d ','|cut -d' ' -f5")
 
-    return state == "Discharging" ? clr per " "  rem : clr per "+" rem
+    return state == "Discharging" ? clr per " "  rem : clr per "+ " rem
 }
 
-func layout() {
-    l = getln("xset -q | grep LED| awk '{print $NF}'")
-    return l == 1000 ? "ru" : "en"
+function layout() {
+    return getln("xset -q | awk '/LED/{print int($NF / 1000) == 1 ? \"ru\" : \"en\"}'")
 }
 
-func tempreture() {
+function tempreture() {
     icon = color(" ", "#80a050")
     return icon getln("sed -n ~/.cache/wttr \
         -e 's/\x1b\\[[0-9;]*m//g' \
@@ -82,7 +75,7 @@ func tempreture() {
     ")
 }
 
-func rain() {
+function rain() {
     icon = color(" ", "#80a050")
     cmd = "sed -n 16p ~/.cache/wttr | tr ' ' '\n' | grep % | tr -d %"
     while (cmd | getline ln > 0) {
@@ -90,18 +83,25 @@ func rain() {
         per += ln
     }
     close(cmd)
-    return icon sprintf("%d", per/n) "%"
+    return n ? sprintf("%s%d%%", icon, per/n) : ""
+}
+
+function rss() {
+    icon = color(" ", "#000")
+    return icon getln("ls -ct ~/Rss/News/*/*/* | wc -l")
 }
 
 BEGIN {
     s=" "
+
     print \
+        s rss() \
         s time() \
         s date() \
-        s cpu() \
-        s memory() \
         s tempreture() \
         s rain() \
+        s cpu() \
+        s memory() \
         s wifi() \
         s sound() \
         s battery() \

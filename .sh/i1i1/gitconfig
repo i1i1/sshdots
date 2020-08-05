@@ -1,9 +1,0 @@
-[core]
-	eol = lf
-	autocrlf = false
-[fsck]
-	zeroPaddedFilemode = ignore
-[fetch "fsck"]
-	zeroPaddedFilemode = ignore
-[receive "fsck"]
-	zeroPaddedFilemode = ignore

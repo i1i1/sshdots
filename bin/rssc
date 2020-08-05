@@ -1,0 +1,34 @@
+#!/bin/sh
+ask()    { dmenu -i -l 8 -fn Go-Mono -p "$1"; }
+ls_cat() { ls | while read cat; do echo $(ls $cat/*/* | wc -l) $cat; done; }
+get_files() { ls -rct $1/*/* | head -500; }
+
+export IFS=$'\n'
+rssarchive=~/Rss/Archive/
+rssnews=~/Rss/News/
+
+set -e
+cd $rssnews
+
+cat=$(ls_cat | sort -rh | ask "Category to read:" | sed 's/^[0-9]* //')
+[ -z "$cat" ] && exit 1
+num=$(ls $cat/* | wc -l)
+fname=$(mktemp /tmp/$cat.XXXX.html)
+
+cat >$fname <<EOF
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rss feed for category $cat. Total news $num</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/source-code-pro.min.css"> 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"> 
+  <link rel="stylesheet" href="https://newcss.net/theme/night.css">
+ </head>
+ <body>$(cat $(get_files $cat))</body>
+</html>
+EOF
+
+mv $(get_files $cat) $rssarchive/
+xdg-open $fname

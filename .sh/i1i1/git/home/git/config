@@ -1,0 +1,27 @@
+[user]
+    email = vanyarybin1@live.ru
+    name = i1i1
+[color]
+    ui = auto
+[url "git+ssh://git@"]
+    insteadOf = https://
+[pull]
+	ff = only
+[core]
+    eol = lf
+    autocrlf = false
+[rebase]
+    autoStash = true
+[alias]
+    br = branch
+    ci = commit
+    cia = commit -a --amend --no-edit
+    cl = clone
+    cld = clone --depth=1
+    co = checkout
+    di = diff
+    f = fuzzy
+    hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+    last = log -1 HEAD
+    pu = push
+    st = status -sb

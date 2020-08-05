@@ -1,0 +1,8 @@
+#!/bin/sh
+BASEDIR=~/.config/wallpapers/
+while :; do
+    for f in $(ls $BASEDIR | shuf); do
+        feh --bg-fill $BASEDIR/$f
+        sleep 1h
+    done
+done

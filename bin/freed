@@ -1,0 +1,12 @@
+#!/bin/sh
+FREE=1
+while :; do
+    sleep 5
+    if [ $(free | awk '/^Mem/ { printf("%d\n", (100*$4) / $2) }') -lt 90 ]; then
+        FREE=1
+        continue
+    fi
+
+    [ $FREE = 1 ] && notify-send "Not enough memory"
+    FREE=0
+done

@@ -1,0 +1,2 @@
+#!/bin/sh
+dmenu -p Search: </dev/null | xargs -d '\n' firefox --search

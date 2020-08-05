@@ -7,16 +7,16 @@ pair_dev_rssi() {
     bluetoothctl           -- default-agent
     timeout 3 bluetoothctl -- scan on
 
-	rssi=$(
-		bluetoothctl -- devices |
-			sed 's/Device //' |
-			sort -h |
-			ask "Pair with:" |
-			cut -d' ' -f 1
-	)
-	bluetoothctl -- pair    $rssi
-	bluetoothctl -- connect $rssi
-	bluetoothctl -- trust   $rssi
+    rssi=$(
+        bluetoothctl -- devices |
+            sed 's/Device //' |
+            sort -h |
+            ask "Pair with:" |
+            cut -d' ' -f 1
+    )
+    bluetoothctl -- pair    $rssi
+    bluetoothctl -- connect $rssi
+    bluetoothctl -- trust   $rssi
 }
 
 set -e

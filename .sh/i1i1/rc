@@ -1,9 +1,38 @@
 #!/usr/bin/env bash
-bash $RCFG_DIR/install_deps
-exec bash --rcfile ~/.sh/i1i1/runcfg
+is_installed() {
+    which $* &>/dev/null
+}
+get_os() {
+    awk -F= '/^ID=/{print $2}' /etc/os-release
+}
+install_packets_os() {
+    install=0
+    for p in $*; do
+        is_installed $p && continue
+        install=1
+        break
+    done
 
-if [ "$RCFG_EXT" ]; then
-    exec tmux -f $RCFG_DIR/tmux/tmux.conf
-else
-    exec bash --rcfile ~/.sh/i1i1/runcfg
-fi
+    [ $install = 0 ] && return
+
+    case $(get_os) in
+        arch)                   $SUDO pacman -S --confirm $* ;;
+        raspbian|debian|ubuntu) $SUDO apt install -y $* ;;
+    esac
+}
+
+install_deps() {
+	[ $(id -u) != 0 ] && SUDO=sudo
+	install_packets_os \
+		  curl \
+		  git \
+		  nmap \
+		  rsync \
+		  tmux \
+		  unzip \
+		  zip \
+		  zsh
+}
+
+install_deps
+exec bash --rcfile ~/.sh/i1i1/runcfg

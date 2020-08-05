@@ -3,10 +3,10 @@ int=no
 num=0
 
 while sleep 1; do
-    timeout 1 ping -c 4 google.com 2>&1 >/dev/null
+    ping -qc 2 google.com
     res=$?
 
-    if [ $res = 1 -a $int = yes ]; then
+    if [ $res != 0 -a $int = yes ]; then
         num=$((num + 1))
         if [ $num = 5 ]; then
             notify-send "No internet duuuuude!"

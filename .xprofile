@@ -1,33 +1,44 @@
 #!/bin/sh
-rerun() {
-    killall -9 "$1" 2>&1 >/dev/null
-    "$@" &
-}
+export IFS=$'\n'
 
-run_one() {
-	if ! pgrep "$1" 2>&1 >/dev/null; then
-		"$@" &
-	fi
-}
+rerun()   { killall -9 "$1" 2>&1 >/dev/null; "$@" & }
+run_one() { if ! pgrep "$1" 2>&1 >/dev/null; then "$@" & fi; }
+run_cfg() { a="$1"; shift 1; echo "$a" | entr -s "$@" & }
+
+lsffprofiles() { awk -F= '/^Name/{print $2}' ~/.mozilla/firefox/profiles.ini; }
 
 ls_run_one() {
-    cat <<EOF
-batteryd
-firefox
-hydroxide imap
-hydroxide smtp
+    cat <<___
 telegram-desktop
-thunderbird
-wttrd
-EOF
+rssd
+___
 }
 
-unsplash
+ls_run_cfg() {
+    cat <<___
+$HOME/.config/dunst/dunstrc dunst
+$HOME/.config/sxhkd/sxhkdrc sxhkd
+$HOME/.config/rssfs.hcl     rssfs
+$HOME/.config/rssfs.hcl     gorssd
+$HOME/bin/batteryd          batteryd
+$HOME/bin/freed             freed
+$HOME/bin/kbdd              kbdd
+$HOME/bin/pingd             pingd
+$HOME/bin/seld              seld
+$HOME/bin/usbd              usbd
+$HOME/bin/walld             walld
+$HOME/bin/wttrd             wttrd
+___
+}
 
-ls_run_one | while read cmd; do
-    run_one $cmd
-done
+killall -9 entr
 
-for i in usbd pingd dunst seld sxhkd; do
-    rerun $i
-done
+#ls_run_cfg | while read ln; do
+#    a=$(echo $ln | awk '{print $1}')
+#    b=$(echo $ln | awk '{print $2}')
+#    run_cfg $a $b
+#done
+
+ls_run_one | while read ln; do run_one $ln; done
+ls_run_cfg | awk '{print $2}' | while read cmd; do rerun $cmd; done
+for p in $(lsffprofiles); do firefox -P $p &; done

@@ -1,5 +1,5 @@
 #!/bin/sh
-sh ~/.xprofile
+bash ~/.xprofile
 while xsetroot -name "$(statusbar)"; do
 	sleep 1
 done

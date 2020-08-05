@@ -1,0 +1,28 @@
+#!/bin/sh
+is_external_kbd_plugged() { xinput -list | grep -q '04b4:2009 Keyboard'; }
+laptop_kbd_setup() {
+    setxkbmap -layout us,ru -option grp:alt_shift_toggle
+    xmodmap ~/.Xmodmap
+}
+external_kbd_setup() {
+    setxkbmap -layout us,ru \
+              -option grp:alt_shift_toggle \
+              -option caps:swapescape
+}
+
+setuped=false
+laptop_kbd_setup
+
+while sleep 1; do
+    is_external_kbd_plugged 
+    case "$? $setuped" in
+        "0 false")
+            external_kbd_setup
+            setuped=true
+            ;;
+        "1 true")
+            laptop_kbd_setup
+            setuped=false
+            ;;
+    esac 
+done

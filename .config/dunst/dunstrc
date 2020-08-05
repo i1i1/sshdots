@@ -74,7 +74,7 @@
     # the top and down respectively.
     # The width can be negative.  In this case the actual width is the
     # screen width minus the width defined in within the geometry option.
-    geometry = "1000x-5-25-100"
+    geometry = "800x3-25-100"
 
     # Shrink window if it's smaller than the width.  Will be ignored if
     # width is 0.
@@ -111,7 +111,7 @@
     sticky_history = yes
 
     # Maximum amount of notifications kept in history
-    history_length = 1
+    history_length = 0
 
     # Display indicators for URLs (U) and actions (A).
     show_indicators = no # yes

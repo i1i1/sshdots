@@ -1,0 +1,9 @@
+#!/bin/sh
+lsffprofiles() { awk -F= '/^Name/{print $2}' ~/.mozilla/firefox/profiles.ini; }
+
+killall -9 firefox
+
+for p in $(lsffprofiles); do
+    firefox -P $p &
+    disown
+done

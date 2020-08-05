@@ -1,13 +1,13 @@
 #!/bin/sh
-set -e
-
 getentries() {
-    for ent in $(ls -r $cachedir); do
+    for ent in $(ls -r $cachedir | head -20); do
         echo "$ent | $(head -1 $cachedir/$ent)"
     done
 }
-cachedir=~/.cache/clipboard/
+cachedir=~/.cache/clipboard
+
 fname=$cachedir/$(getentries | dmenu -p 'Copy:' -l 5 | cut -d'|' -f1)
+echo $fname
 
 edit _not_disown_ $fname
 head -c-1 $fname | xclip -in -selection clipboard

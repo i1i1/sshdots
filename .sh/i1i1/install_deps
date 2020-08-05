@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-is_installed() {
-    which $* &>/dev/null
-}
-get_os() {
-    awk -F= '/^ID=/{print $2}' /etc/os-release
-}
+get_os() { (. /etc/os-release; echo $ID); }
 install_packets_os() {
     install=0
     for p in $*; do
@@ -16,53 +11,9 @@ install_packets_os() {
 
     case $(get_os) in
         arch)                   pacman -S --confirm $* ;;
-        raspbian|debian|ubuntu) apt install -y $* ;;
-    esac
-}
-install_packets_special() {
-    for p in $*; do
-        is_installed $p && continue
-        install_$p
-    done
-}
-install_fzf() {
-    is_installed fzf && return
-
-    git clone --depth 1 https://github.com/junegunn/fzf.git /tmp/fzf
-    yes n | /tmp/fzf/install &>/dev/null
-    cp /tmp/fzf/bin/fzf /usr/bin
-    rm -r ~/.fzf.bash /tmp/fzf
-}
-install_ripgrep() {
-    is_installed rg && return
-
-    if [ $(uname -m) = x86_64 ]; then
-        URL=https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep-11.0.2-x86_64-unknown-linux-musl.tar.gz
-    else
-        URL=https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep-11.0.2-arm-unknown-linux-gnueabihf.tar.gz
-    fi
-
-    (
-        cd /tmp
-        wget -O - $URL | tar zxf -
-        cp ripgrep-*/rg /usr/bin/
-        rm -r ripgrep-*/
-    )
-}
-install_exa() {
-    is_installed exa && return
-
-    case $(get_os) in
-        arch)          install_packets_os exa ;;
-        debian|ubuntu)
-            [ $(uname -m) != x86_64 ] && return
-
-            ZIP=$(mktemp --suffix zip -u)
-            URL=https://github.com/ogham/exa/releases/download/v0.9.0/exa-linux-x86_64-0.9.0.zip
-            curl -o $ZIP -L $URL
-            unzip $ZIP
-            mv exa* /usr/bin/exa
-            rm $ZIP
+        raspbian|debian|ubuntu)
+            apt-get update --fix-missing
+            apt install -y $*
             ;;
     esac
 }
@@ -77,12 +28,3 @@ install_packets_os \
     unzip \
     zip \
     zsh
-
-install_packets_special \
-    exa \
-    fzf \
-    ripgrep
-
-[ -d ~/.sh/i1i1/tmux/sidebar ] || \
-    git clone --depth 1 https://github.com/tmux-plugins/tmux-sidebar \
-        ~/.sh/i1i1/tmux/sidebar

@@ -25,6 +25,14 @@ super + b
 super + shift + b
     dbook
 super + s
-    dscreenshot
+    sleep 0.2 && dscreenshot
+super + shift + s
+    sleep 0.2 && dscreenshot -t
+super + shift + t
+    ddict
 super + x
     dhow
+super + shift + x
+    dsearch
+super + r
+    rssc

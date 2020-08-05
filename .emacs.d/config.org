@@ -44,7 +44,7 @@ Setting default shell inside emacs to Bash
 #+BEGIN_SRC emacs-lisp
   (custom-set-faces
    '(default ((t (:stipple nil
-                           :height 80
+                           :height 80 ; 80
                            :weight normal
                            :width normal
                            :family "Go Mono"
@@ -395,11 +395,14 @@ Which key is a package which shows possible ways to complete the sequence of com
 ** Go lang
 #+BEGIN_SRC emacs-lisp
   (use-package company-go
-	:init
-	(setq company-go-begin-after-member-access t))
-	(add-hook 'go-mode-hook
-	   (lambda ()
-		  (add-to-list 'company-backends 'company-go)))
+    :init
+    (setq company-go-begin-after-member-access t)
+    (add-hook 'go-mode-hook
+              (lambda ()
+                (set (make-local-variable 'company-backends) '(company-go))
+                (company-mode)))
+    )
+
 #+END_SRC
 ** Java
 #+BEGIN_SRC emacs-lisp
@@ -486,6 +489,23 @@ Which key is a package which shows possible ways to complete the sequence of com
   (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
   (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 #+END_SRC
+* Rust lang
+#+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+    :config
+    (setq rust-format-on-save t))
+  (use-package flycheck-rust
+    :after rust-mode
+    :config
+    (with-eval-after-load 'rust-mode
+      (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+  (use-package racer
+    :after rust-mode
+    :config
+    (add-hook 'rust-mode-hook #'racer-mode)
+    (add-hook 'racer-mode-hook #'eldoc-mode))
+  (use-package lsp-ui)
+#+END_SRC
 * Minor issues
 ** Hungry-delete
 #+BEGIN_SRC emacs-lisp
@@ -513,61 +533,37 @@ Which key is a package which shows possible ways to complete the sequence of com
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook 'hs-minor-mode)
 #+END_SRC
-** Eiffel lang
+** Editorconfig
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.e\\'" . eiffel-mode))
-  (autoload 'eiffel-mode "eiffel" "Major mode for Eiffel programs" t)
+  (use-package editorconfig
+	:config
+	(editorconfig-mode 1))
 #+END_SRC
-** Go lang
+** Languages
 #+BEGIN_SRC emacs-lisp
+  (use-package vala-mode)
+  (use-package dockerfile-mode)
+  (use-package fish-mode)
+  (use-package fish-completion)
+  (use-package markdown-mode)
+  (use-package dot-mode)
+  (use-package graphviz-dot-mode)
+  (use-package idris-mode)
+  (use-package elixir-mode)
+  (use-package yaml-mode)
   (use-package go-mode
     :config
 	(add-hook 'before-save-hook 'gofmt-before-save))
-#+END_SRC
-** Vala lang
-#+BEGIN_SRC emacs-lisp
-    (use-package vala-mode)
-#+END_SRC
 
-** Dockerfile
-#+BEGIN_SRC emacs-lisp
-    (use-package dockerfile-mode)
-#+END_SRC
+  (use-package typescript-mode)
+  (setq-default typescript-indent-level 2)
 
-** Fish lang
-#+BEGIN_SRC emacs-lisp
-    (use-package fish-mode)
-    (use-package fish-completion)
-#+END_SRC
-
-** Rust lang
-#+BEGIN_SRC emacs-lisp
-  (use-package rust-mode
-	:config
-	(setq rust-format-on-save t))
-  (use-package flycheck-rust
-	:after rust-mode
-	:config
-	(with-eval-after-load 'rust-mode
-	  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
-  (use-package racer
-	:after rust-mode
-	:config
-	(add-hook 'rust-mode-hook #'racer-mode)
-	(add-hook 'racer-mode-hook #'eldoc-mode))
-#+END_SRC
-** MarkDown
-#+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode)
+  (add-to-list 'auto-mode-alist '("\\.e\\'" . eiffel-mode))
+  (autoload 'eiffel-mode "eiffel" "Major mode for Eiffel programs" t)
 #+END_SRC
 ** Gdb (GUD)
 #+BEGIN_SRC emacs-lisp
   (setq gdb-show-main t)
-#+END_SRC
-** Dot lang
-#+BEGIN_SRC emacs-lisp
-  (use-package dot-mode)
-  (use-package graphviz-dot-mode)
 #+END_SRC
 ** Ansi colors
 #+BEGIN_SRC emacs-lisp
@@ -577,8 +573,7 @@ Which key is a package which shows possible ways to complete the sequence of com
   (ansi-color-apply-on-region (point-min) (point-max)))
 #+END_SRC
 
-** Ansi colors
+** Auto revert-mode
 #+BEGIN_SRC emacs-lisp
-  (require 'floobits)
+  (global-auto-revert-mode t)
 #+END_SRC
-

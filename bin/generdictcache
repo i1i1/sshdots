@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+def read_string(f):
+    c = f.read(1)
+    arr = []
+    if c == b'':
+        raise Exception("EOF")
+    while c != b'\0':
+        arr.append(c)
+        c = f.read(1)
+    return b''.join(arr).decode("utf-8")
+
+def print_entry(f):
+    _ = f.read(4)
+    _ = f.read(4)
+    s = read_string(f)
+    print(s)
+    
+def print_entries(f):
+    while True:
+        try:
+            print_entry(f)
+        except Exception as e:
+            return
+
+def main(dictionary):
+    with open(dictionary, 'rb') as f:
+        print_entries(f)
+
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv[1])

@@ -1,6 +1,13 @@
 #!/bin/sh
 set -e
+tmpname=~/.cache/screenshot.png
+if [ "$1" = "-t" ]; then tmp=1; fi
 
-scrot -soq 100 ~/.cache/screenshot.png
-name="$(echo -n | dmenu -p 'Enter name for screenshot:')"
-cp ~/.cache/screenshot.png ~/Images/"$name".png
+scrot -soq 100 $tmpname
+
+if [ "$tmp" = 1 ] || [ "$(printf 'no\nyes' | dmenu -p Save:)" = no ]; then
+    xclip -in -selection clipboard -t image/png $tmpname
+else
+    name="$(dmenu -p 'Screenshot name:' </dev/null)"
+    cp $tmpname ~/Images/Screenshots/"$name".png
+fi

@@ -1,24 +1,24 @@
 #!/bin/sh
-sink_name=$(pacmd info | grep 'Default sink' | awk '{print $4}')
-sink_number=$(pacmd info | grep "sink:.*$sinkName" | awk '{print $2}')
-
 getprops() {
-    pactl list sinks | awk "
-        /Sink #$sink_number/ { p = 1; next}
-        /Sink #/             { p = 0 }
-        p == 1               { print }
-    "
+    pactl list sinks | awk -v s="$sink_number" '
+        $0 ~ ("Sink #"s) { p = 1; next}
+        /Sink #/  { p = 0 }
+        p == 1    { print }
+    '
 }
+getvolume()  { getprops | awk '/State: (IDLE|RUNNING)/{a=1} a&&/Volume: front/{print $5}'; }
+ismute()     { [ "$(getprops | awk '/Mute:/ {print $2}')" = "yes" ]; }
+sendnotify() { notify-send "$(ismute && echo 'M ')Volume $(getvolume)"; }
 
-getvolume() { getprops | awk '/Volume: front/ {print $5}'; }
-ismute()    { [ $(getprops | awk '/Mute:/ {print $2}') = "yes" ]; }
+sink_name=$(pacmd info | grep 'Default sink' | cut -d: -f2 | tr -d ' ')
+sink_number=$(pacmd info| awk -v sink="$sink_name" '/name:/ && ($0 ~ (sink">")){sub(/.*: /, "", ll); print ll} {ll=$0}')
 
 [ $# != 1 ] && exit 1
 
-if [ "$1" = toggle ]; then
-    pactl set-sink-mute @DEFAULT_SINK@ toggle
-else
-    pactl set-sink-volume @DEFAULT_SINK@ $1
-fi
+case "$1" in
+    toggle)   pactl set-sink-mute   @DEFAULT_SINK@ toggle && sendnotify ;;
+    +*%|-*%)  pactl set-sink-volume @DEFAULT_SINK@ $1     && sendnotify ;;
+    get_sink) echo $sink_name                             ;;
+    *)        exit 1
+esac
 
-notify-send "$(ismute && echo 'M ')Volume $(getvolume)"

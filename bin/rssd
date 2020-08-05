@@ -1,0 +1,62 @@
+#!/usr/bin/python3
+import shutil
+import hashlib
+import time
+import os
+
+
+def get_files(dirpath):
+    for p in os.scandir(dirpath):
+        if p.is_file():
+            yield p
+        elif p.is_dir():
+            for f in get_files(p):
+                yield f
+
+def get_hash(fname):
+    with open(fname, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
+
+
+def get_rssdir():
+    cfgname = os.path.join(os.environ["XDG_CONFIG_HOME"], "rssfs.hcl")
+    with open(cfgname) as f:
+        for ln in f.readlines():
+            if ln.startswith("mount"):
+                dirname = ln.split("=")[1]
+                dirname = dirname.lstrip(" \"")
+                dirname = dirname.rstrip("\"\n")
+                return dirname
+    raise Exception("Can't find dirname")
+
+def save_news(news, rssnews, archive):
+    h = get_hash(news) + ".html"
+
+    tail, name = os.path.split(news)
+    tail, jour = os.path.split(tail)
+    tail, cat = os.path.split(tail)
+
+    dirname = os.path.join(rssnews, cat, jour) 
+    archive = os.path.join(archive, h)
+    fname = os.path.join(rssnews, cat, jour, h)
+
+    if not os.path.exists(fname) and not os.path.exists(archive):
+        print(f"Saving {fname}")
+        os.makedirs(dirname, exist_ok=True)
+        shutil.copy2(news, fname)
+
+def main():
+    rssdir = get_rssdir()
+    rssnews = os.path.join(os.environ["HOME"], "Rss/News/")
+    rssarchive = os.path.join(os.environ["HOME"], "Rss/Archive/")
+    os.chdir(rssdir)
+
+    while True:
+        for n in get_files(os.curdir):
+            save_news(n, rssnews, rssarchive)
+        print("Done!")
+        time.sleep(30 * 60)
+
+
+if __name__ == "__main__":
+    main()

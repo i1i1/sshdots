@@ -13,10 +13,13 @@ done
 
 export DEFAULT_USER=i1i1
 export EDITOR=edit
+export BROWSER=browser
 export GIT_CONFIG=$RCFG_DIR/gitconfig
+export STARDICT_DATA_DIR=$HOME/.config/
 export IFS=$'\n'
 export LC_ALL=en_US.utf8
 export TERM=xterm-256color
 export TODO_DIR=$HOME/.config/todotxt
+export XDG_CONFIG_HOME="$HOME/.config"
 
 eval `dircolors $RCFG_DIR/dircolors`

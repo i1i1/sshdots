@@ -1,0 +1,12 @@
+#!/bin/sh
+lsprofiles()     { awk -F= '/^Name/{print $2}' ~/.mozilla/firefox/profiles.ini; }
+getprofile()     { awk -F= -v nm="$1" '/^[/{if(name==nm)print path} /^Name/{name=$2} /^Path/{path=$2}' ~/.mozilla/firefox/profiles.ini; }
+ask()            { dmenu -i -l 6 -fn Go-Mono -p "$1"; }
+
+for l in "$@"; do
+    profile=$((lsprofiles; echo Private) | ask "Open URL in:")
+
+    if [ "$profile" = Private ];            then firefox --private-window "$l"
+    elif lsprofiles | grep -q ^"$profile"$; then firefox -P "$profile"    "$l"
+    fi
+done

@@ -1,0 +1,144 @@
+#!/usr/bin/env gorun
+package main
+
+import (
+	"bufio"
+	"crypto/md5"
+	"fmt"
+	"os/exec"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"path"
+	"strings"
+	"sync"
+	"time"
+)
+
+var (
+	rssnews    = path.Join(os.Getenv("HOME"), "Rss", "News")
+	rssarchive = path.Join(os.Getenv("HOME"), "Rss", "Archive")
+	cfgname    = filepath.Join(os.Getenv("XDG_CONFIG_HOME"), "rssfs.hcl")
+)
+
+func die(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func getRssDir() string {
+	f, err := os.Open(cfgname)
+	die(err)
+	defer f.Close()
+	sc := bufio.NewScanner(f)
+	for sc.Scan() {
+		ln := sc.Text()
+		if strings.HasPrefix(ln, "mount") {
+			dirname := strings.Split(ln, "=")[1]
+			dirname = strings.TrimLeft(dirname, " \"")
+			dirname = strings.TrimRight(dirname, "\"\n")
+			return dirname
+		}
+	}
+	panic("Can't find rss dir")
+	return ""
+}
+
+func merge(cs ...<-chan string) <-chan string {
+	out := make(chan string, len(cs))
+	wg := &sync.WaitGroup{}
+	wg.Add(len(cs))
+	for _, c := range cs {
+		go func(wg *sync.WaitGroup, c <-chan string) {
+			for v := range c {
+				out <- v
+			}
+			wg.Done()
+		}(wg, c)
+	}
+	go func(wg *sync.WaitGroup, out chan<- string) {
+		wg.Wait()
+		close(out)
+	}(wg, out)
+	return out
+}
+
+func getFiles(dir string) <-chan string {
+	ch := make(chan string, 20)
+	go func(ch chan<- string) {
+		defer close(ch)
+		nodes, err := ioutil.ReadDir(dir)
+		die(err)
+		dirs := make([]<-chan string, 0)
+		for _, n := range nodes {
+			if !n.IsDir() {
+				ch <- filepath.Join(dir, n.Name())
+				continue
+			}
+			dirs = append(dirs, getFiles(path.Join(dir, n.Name())))
+		}
+		for path := range merge(dirs...) {
+			ch <- path
+		}
+	}(ch)
+	return ch
+}
+
+func getHash(news string) string {
+	f, err := os.Open(news)
+	die(err)
+	defer f.Close()
+	bs, err := ioutil.ReadAll(f)
+	die(err)
+	return fmt.Sprintf("%x", md5.Sum(bs))
+}
+
+func exists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	die(err)
+	return false
+}
+
+func copy2(from, to string) {
+	cmd := exec.Command("cp", from, to)
+	die(cmd.Start())
+	die(cmd.Wait())
+}
+
+func saveNews(news string) {
+	h := getHash(news) + ".html"
+
+	tail, _ := filepath.Split(news)
+	tail, jour := path.Join(tail, ".."), path.Base(tail)
+	cat := path.Base(tail)
+
+	dirname := path.Join(rssnews, cat, jour)
+	archive := path.Join(rssarchive, h)
+	fname := filepath.Join(dirname, h)
+
+	if !exists(fname) && !exists(archive) {
+		fmt.Println("Saving", news, "to", fname)
+		os.MkdirAll(dirname, os.ModePerm)
+		copy2(news, fname)
+	}
+}
+
+func main() {
+	os.Chdir(getRssDir())
+	d, err := os.Getwd()
+	die(err)
+	for {
+		for news := range getFiles(d) {
+			saveNews(news)
+		}
+		fmt.Println("Done")
+		time.Sleep(time.Hour / 2)
+	}
+}

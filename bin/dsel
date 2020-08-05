@@ -1,10 +1,12 @@
 #!/bin/sh
 set -e
+alias pdo='do while [ $(jobs | wc -l) = 8 ]; do sleep 0.01; done; ('
+alias pdone=') & done; wait'
 
 getentries() {
-    for ent in $(ls -r $cachedir); do
+    for ent in $(ls -r $cachedir); pdo
         echo "$ent | $(head -1 $cachedir/$ent)"
-    done
+    pdone | sort -r
 }
 cachedir=~/.cache/clipboard/
 fname=$cachedir/$(getentries | dmenu -p 'Copy:' -l 5 | cut -d'|' -f1)

@@ -1,23 +1,9 @@
-#!/usr/bin/env bash
-diff() {
-    tmppipe=$(mktemp)
-    chmod 600 $tmppipe
-    env diff -u --color=always "$@" > $tmppipe
-    ret=$?
-    case $ret in
-        1) cat $tmppipe | less -R ;;
-        0) echo Files are same ;;
-    esac
-    rm $tmppipe
-    return $ret
-}
-
 edit() {
     if which emacs &>/dev/null; then
         emacsclient -a "" -c $* &>/dev/null &
         disown
     else
-        env vim $*
+        e vim $*
     fi
 }
 
@@ -26,19 +12,10 @@ lsips() {
 
     ifconfig | \
         awk '
-    /^$/ {
-        a = 1
-        next
-    }
-    a == 1 {
-        a = 2
-        dev = $1
-        next
-    }
-    a == 2 && /inet / {
-        a = 0
-        printf("% -8s %s\n", dev, $2)
-    }' | sort -h
+    /^$/              { a = 1; next }
+    a == 1            { a = 2; dev = $1; next }
+    a == 2 && /inet / { a = 0; printf("% -8s %s\n", dev, $2) }
+    ' | sort -h
 
     echo
 
@@ -47,14 +24,9 @@ lsips() {
         awk 'FNR % 3 != 2' | \
         sed '$d' | sed '$d' | \
         awk '
-    FNR % 2 == 1 {
-        ip = $5
-    }
-    FNR % 2 == 0 {
-        sub(/^.*\(/, "")
-        sub(/\)$/, "")
-        printf("% -15s %s\n", ip":", $0)
-    }' | sort -h
+    FNR % 2 == 1 { ip = $5 }
+    FNR % 2 == 0 { sub(/^.*\(/, ""); sub(/\)$/, ""); printf("% -15s %s\n", ip":", $0) }
+    ' | sort -h
 }
 
 lsssh() {
@@ -85,13 +57,27 @@ ssh() {
         )  >> ~/.ssh/config 
     }
     connect() {
-        env ssh $1 -t \
+        e ssh $1 -t \
             "export RCFG=$RCFG;
              export RCFG_DIR=\$HOME/.sh/\$RCFG/;
              export RCFG_EXT=1;
              bash --rcfile \$RCFG_DIR/rc"
     }
-    copy_config() { tar cfh - -C ~ .sh/ | ssh $1 tar xfC - '~'; }
+    copy_config() {
+        find ~/.sh/* -type f | \
+            xargs stat -c %Y | \
+            awk 'BEGIN{a=0} a < $1{a=$1} END{print a}' | \
+            read timestamp
+        e ssh $1 find '~/.sh/*' -type f | \
+            e ssh $1 xargs stat -c %Y | \
+            awk 'BEGIN{a=0} a < $1{a=$1} END{print a}' | \
+            read timestamp_ssh
+
+        [ ! -z "$timestamp_ssh" -a $timestamp -gt $timestamp_ssh ] && {
+            green "Copying shell configuration\n"
+            tar cfh - -C ~ .sh/ | e ssh $1 tar xfC - '~'
+        }
+    }
     color() {
         printf "\033[0;$1m"
         shift 1
@@ -102,7 +88,7 @@ ssh() {
     green()  { color 32 "$@" ; }
     yellow() { color 33 "$@" ; }
 
-    [ $# != 1 ] && env ssh $@ && return $?
+    [ $# != 1 ] && e ssh $@ && return $?
     host=$1
 
     is_new_ssh $host || {
@@ -127,10 +113,8 @@ _gcloud_create() {
     PROJECT=$1
     MACHINE_TYPE=$2
     DISK_SIZE=$3
+    if [ "$4" = true ]; then FLAG=--google-preemptible; fi
     MACHINE_NAME=$5
-    if [ "$4" = true ]; then
-        FLAG=--google-preemptible
-    fi
 
     docker-machine ls -q | grep ^"$MACHINE_NAME"$ || {
         docker-machine create \
@@ -143,37 +127,63 @@ _gcloud_create() {
                        $MACHINE_NAME
     }
 
-    eval $(docker-machine env $MACHINE_NAME)
+    eval $(docker-machine e $MACHINE_NAME)
 }
 
 dcm_work() { _gcloud_create copper-tracker-270409 n1-standard-16 35 false i1i1; }
 
-unalias g grep ls l la ll "..." "...."
+unalias_many() { for a in "$@"; do unalias "$a" 2>/dev/null; done; }
+
+unalias_many diff g grep ls l la ll "..." "...."
+
+
+diff() {
+    tmppipe=$(mktemp)
+    chmod 600 $tmppipe
+    e diff -u --color=always "$@" > $tmppipe
+    ret=$?
+    case $ret in
+        1) cat $tmppipe | less -R ;;
+        0) echo Files are same ;;
+    esac
+    rm $tmppipe
+    return $ret
+}
+
+git_() {
+    if [ -z "$RCFG_EXT" ]; then
+        XDG_CONFIG_HOME=$RCFG_DIR/git/home e git "$@"
+    else
+        XDG_CONFIG_HOME=$RCFG_DIR/git/ssh  e git "$@"
+    fi
+}
 
 ..()   { cd ..;   }
 ...()  { ..;  ..; }
 ....() { ...; ..; }
 ca()   { cargo "$@"; }
+cat()  { whatis bat &>/dev/null && bat "$@" || e cat "$@" }
 dc()   { docker "$@"; }
 dcc()  { docker-compose "$@"; }
 dcm()  { docker-machine "$@"; }
+e()    { env "$@"; }
 ec()   { edit "$@"; }
 g()    { git "$@"; }
 git()  { git_ "$@"; }
-git_() { XDG_CONFIG_HOME=$RCFG_DIR env git "$@"; }
-grep() { env grep --color=auto "$@"; }
+grep() { e grep --color=auto "$@"; }
 l()    { ls "$@"; }
 la()   { ll -a "$@"; }
-less() { env less -R "$@"; }
+ldwn() { find ~/Download -type f | xargs -d '\n' ls -t | head -1; }
+less() { e less -R "$@"; }
 ll()   { ls -l "$@"; }
 ls()   { ls_ --color=auto "$@"; }
-ls_()  { exa / &>/dev/null && exa --color-scale "$@" || env ls "$@"; }
-ls_()  { exa / &>/dev/null && exa --color-scale "$@" || env ls "$@"; }
-rg()   { env rg --color=auto "$@"; }
+ls_()  { exa / &>/dev/null && exa --color-scale "$@" || e ls "$@"; }
+rg()   { e rg --color=auto "$@"; }
 t()    { todotxt-machine $TODO_DIR/todo.txt $TODO_DIR/archive.txt;  }
+top()  { whatis bashtop &>/dev/null && bashtop || whatis htop &>/dev/null && htop || e top }
 vi()   { vim "$@"; }
 vim()  { edit "$@"; }
-wttr() { cat ~/.cache/wttr; }
+wttr() { e cat ~/.cache/wttr; }
 
 #
 # In order to make parallel loops like this:

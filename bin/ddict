@@ -1,0 +1,35 @@
+#!/bin/sh
+ask() { dmenu -i -l 6 -fn Go-Mono -p "$1" -it "$2"; }
+
+export IFS=$'\n'
+cachedir=~/.cache/dict/
+mkdir -p $cachedir
+
+for d in $STARDICT_DATA_DIR/dic/*.idx; do
+    c=$cachedir/$(basename "$d" .idx)
+    [ -f "$c" ] || generdictcache "$d" >$c
+done
+
+word="$(cat $cachedir/* | ask 'Translate:' $(xclip -out -selection clipboard))"
+echo "$word" >> $cachedir/searched
+
+sdcv -e -n "$word" | awk 'NR > 4' | awk '
+function push(arr, ent) { arr[++arr[0]] = ent }
+function pop(arr)       { return arr[arr[0]--] }
+
+BEGIN { names[0] = bodys[0] = 0 }
+
+/^$/       { push(names, name); push(bodys, a); a = name = ""; next }
+name == "" { name=$0;   next }
+a    == "" { a=$0;      next }
+           { a=a"\n"$0; next }
+END {
+    maxln = 400
+
+    while (names[0]) {
+        body = pop(bodys)
+        if (length(body) > maxln) body=substr(body, 1, maxln)"..."
+        system("notify-send -u critical \""pop(names)"\" \""body"\"")
+    }
+}
+'
