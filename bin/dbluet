@@ -1,30 +1,37 @@
 #!/bin/sh
 ask() { dmenu -i -l 6 -fn Go-Mono -p "$1" ; }
-get_paired_names() { bluetoothctl -- paired-devices | sed 's/^Device \(..:\)\+.. //' ; }
-get_rssi()         { bluetoothctl -- paired-devices | grep -F "$1" | cut -d' ' -f2; }
+b()   { bluetoothctl -- "$@" ; }
+get_paired_names() { b paired-devices | sed 's/^Device \(..:\)\+.. //' ; }
+get_rssi()         { b paired-devices | grep -F "$1" | cut -d' ' -f2; }
 pair_dev_rssi() {
-    bluetoothctl           -- agent on
-    bluetoothctl           -- default-agent
-    timeout 3 bluetoothctl -- scan on
+    b agent on
+    b default-agent
+    b scan on
+    sleep 1
 
     rssi=$(
-        bluetoothctl -- devices |
+        b devices |
             sed 's/Device //' |
             sort -h |
             ask "Pair with:" |
             cut -d' ' -f 1
     )
-    bluetoothctl -- pair    $rssi
-    bluetoothctl -- connect $rssi
-    bluetoothctl -- trust   $rssi
+    b pair    $rssi
+    b connect $rssi || true
+    b trust   $rssi
 }
 
 set -e
-bluetoothctl -- power on &>/dev/null
-dev="$((echo Disconnect; get_paired_names; echo Pair) | ask 'Connect to:')"
+if ! systemctl show bluetooth | grep -q '^StatusText=Running$'; then
+    sudo systemctl enable --now bluetooth
+fi
+
+b power on &>/dev/null
+dev="$( { echo Disconnect; get_paired_names; echo Pair; } | ask 'Connect to:' )"
 
 case "$dev" in
-    Disconnect) bluetoothctl -- disconnect;;
+    Disconnect) b disconnect;;
     Pair)       pair_dev_rssi ;;
-    *)          bluetoothctl -- connect $(get_rssi "$dev")
+    *)          b connect $(get_rssi "$dev")
 esac
+

@@ -51,12 +51,9 @@ Setting default shell inside emacs to Bash
                            )))))
   ;(add-to-list 'default-frame-alist '(font . "Go Mono-8"))
   (setq-default line-spacing 10)
-  (global-linum-mode t)
 
-  (use-package linum-relative
-    :config
-    (setq linum-relative-current-symbol "")
-    (add-hook 'prog-mode-hook 'linum-relative-mode))
+  (use-package nlinum
+    :config (global-nlinum-mode t))
 #+END_SRC
 ** Alias
 #+BEGIN_SRC emacs-lisp

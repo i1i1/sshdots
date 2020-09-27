@@ -184,6 +184,8 @@ top()  { whatis bashtop &>/dev/null && bashtop || whatis htop &>/dev/null && hto
 vi()   { vim "$@"; }
 vim()  { edit "$@"; }
 wttr() { e cat ~/.cache/wttr; }
+supervisorctl() { e supervisorctl -c .config/supervisord.conf; }
+
 
 #
 # In order to make parallel loops like this:

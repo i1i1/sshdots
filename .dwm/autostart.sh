@@ -1,5 +1,5 @@
 #!/bin/sh
-bash ~/.xprofile
+supervisord -c .config/supervisord.conf
 while xsetroot -name "$(statusbar)"; do
 	sleep 1
 done

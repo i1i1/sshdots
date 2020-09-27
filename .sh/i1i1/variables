@@ -7,7 +7,7 @@ appendpath () {
 
 
 for p in /sbin /usr/local/go/bin /usr/local/bin /usr/local/sbin \
-               $HOME/bin $HOME/.local/bin $HOME/.cargo/bin/; do
+               $HOME/bin $HOME/.local/bin $HOME/.cargo/bin/ $HOME/go/bin; do
     appendpath $p
 done
 

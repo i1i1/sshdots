@@ -94,16 +94,15 @@ function rss() {
 BEGIN {
     s=" "
 
-    print \
-        s rss() \
-        s time() \
-        s date() \
-        s tempreture() \
-        s rain() \
-        s cpu() \
-        s memory() \
-        s wifi() \
-        s sound() \
-        s battery() \
-        s layout()
+	print rss() \
+			s time() \
+			s date() \
+			s tempreture() \
+			s rain() \
+			s cpu() \
+			s memory() \
+			s wifi() \
+			s sound() \
+			s battery() \
+			layout()
 }
