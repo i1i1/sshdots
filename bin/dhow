@@ -6,6 +6,7 @@ lang_ext() {
         c++)            echo cpp        ;;
         docker)         echo Dockerfile ;;
         docker-compose) echo yml        ;;
+        python)         echo py         ;;
         *)              echo $1         ;;
     esac
 }

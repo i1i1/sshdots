@@ -1,0 +1,15 @@
+[core]
+	eol = lf
+	autocrlf = false
+[fsck]
+	zeroPaddedFilemode = ignore
+[fetch "fsck"]
+	zeroPaddedFilemode = ignore
+[receive "fsck"]
+	zeroPaddedFilemode = ignore
+[filter "git-crypt"]
+	smudge = \"git-crypt\" smudge
+	clean = \"git-crypt\" clean
+	required = true
+[diff "git-crypt"]
+	textconv = \"git-crypt\" diff

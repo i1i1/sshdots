@@ -104,5 +104,5 @@ BEGIN {
 			s wifi() \
 			s sound() \
 			s battery() \
-			layout()
+			s layout()
 }

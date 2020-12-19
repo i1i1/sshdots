@@ -162,6 +162,7 @@ git_() {
 ...()  { ..;  ..; }
 ....() { ...; ..; }
 ca()   { cargo "$@"; }
+can()  { cargo +nightly "$@"; }
 cat()  { whatis bat &>/dev/null && bat "$@" || e cat "$@" }
 dc()   { docker "$@"; }
 dcc()  { docker-compose "$@"; }

@@ -3,8 +3,6 @@
     name = i1i1
 [color]
     ui = auto
-[url "git+ssh://git@"]
-    insteadOf = https://
 [pull]
 	ff = only
 [core]
@@ -12,6 +10,7 @@
     autocrlf = false
 [rebase]
     autoStash = true
+    autoSquash = true
 [alias]
     br = branch
     ci = commit
@@ -20,8 +19,12 @@
     cld = clone --depth=1
     co = checkout
     di = diff
-    f = fuzzy
+    fixup  = "!f() { git ci    --fixup $1; git rebase $1 ; }; f"
+    fixupa = "!f() { git ci -a --fixup $1; git rebase $1 ; }; f"
     hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
     last = log -1 HEAD
     pu = push
     st = status -sb
+
+[url "git+ssh://git@"]
+    insteadOf = https://

@@ -10,15 +10,16 @@
     autocrlf = false
 [rebase]
     autoStash = true
+    autoSquash = true
 [alias]
     br = branch
     ci = commit
     cia = commit -a --amend --no-edit
+    fixup = "!f() { g ci --fixup $1 && g rebase $1 ; }; f"
     cl = clone
     cld = clone --depth=1
     co = checkout
     di = diff
-    f = fuzzy
     hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
     last = log -1 HEAD
     pu = push

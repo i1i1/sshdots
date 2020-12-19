@@ -3,18 +3,14 @@ PLUGGED=0
 
 is_plugged() { xrandr -q | grep -q "^DP1 connected" ; }
 check_plugged() {
-    is_plugged && {
-        xrandr --output eDP1 --off
-        xrandr --output DP1 --mode 1920x1080
-        xrandr --output DP1 --mode 3520x1980R
-        PLUGGED=1
-    }
+    is_plugged || return
+    xrandr --output eDP1 --off
+    xrandr --output DP1 --mode 1920x1080
+    xrandr --output DP1 --mode 3520x1980R
+    PLUGGED=1
 }
-check_unplugged() { is_plugged || { xrandr --output eDP1 --auto; PLUGGED=0; }; }
-check_mons() {
-    echo $PLUGGED
-    [ $PLUGGED = 0 ] && check_plugged || check_unplugged
-}
+check_unplugged() { is_plugged || { xrandr --output eDP1 --auto --output DP1 --off; PLUGGED=0; }; }
+check_mons() { [ $PLUGGED = 0 ] && check_plugged || check_unplugged; }
 
 # cvt -r 3520 1980 60
 xrandr --newmode "3520x1980R"  449.50  3520 3568 3600 3680  1980 1983 1988 2037 +hsync -vsync

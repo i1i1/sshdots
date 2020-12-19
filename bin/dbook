@@ -1,5 +1,5 @@
 #!/bin/sh
-cd ~/Download/
+cd ~/Downloads/
 pdf="$(
     stat -c '%Y %n' * 'Telegram Desktop'/* |
         sort -rk1 |

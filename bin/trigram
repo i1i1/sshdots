@@ -1,0 +1,40 @@
+#!/usr/bin/env gorun
+package main
+
+import (
+    "os"
+	"fmt"
+	"log"
+    "bufio"
+
+	. "github.com/kkdai/trigram"
+)
+
+func main() {	
+	if len(os.Args) != 3 {
+		log.Fatalf("%s <word> <file>", os.Args[0])
+	}
+
+	word, fname := os.Args[1], os.Args[2]
+	ti := NewTrigramIndex()
+	
+    file, err := os.Open(fname)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        line := scanner.Text()
+		ti.Add(line)
+    }
+
+    if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+
+	for r := range ti.Query(word) {
+		fmt.Println(ti.TrigramMap[Trigram(r)])
+	}
+}
