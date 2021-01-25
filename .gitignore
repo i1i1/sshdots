@@ -27,6 +27,9 @@
 .config/vlc/
 .config/xfce4/
 .config/zoomus.conf
+.config/GNS3/
+.config/Xavion/
+.config/freerdp
 .emacs.d/auto-save-list/
 .emacs.d/config.el
 .emacs.d/elpa
