@@ -77,7 +77,7 @@ Setting default shell inside emacs to Bash
 #+BEGIN_SRC emacs-lisp
   (custom-set-faces
    '(default ((t (:stipple nil
-                           :height 95
+                           :height 73
                            :weight normal
                            :width normal
                            :family "Go Mono"
@@ -325,7 +325,7 @@ Which key is a package which shows possible ways to complete the sequence of com
   ;  :init
   ;  (projectile-mode))
 
-  (require 'page-break-lines)
+  ;(require 'page-break-lines)
   ;(require 'projectile)
   (use-package dashboard
     :config
@@ -521,9 +521,9 @@ Which key is a package which shows possible ways to complete the sequence of com
 ;  (setq split-width-threshold 0)
 ;  (setq split-height-threshold nil)
   (use-package magit)
-  (use-package evil-magit
-    :init
-    (evil-magit-init))
+  ;(use-package evil-magit
+  ;  :init
+  ;  (evil-magit-init))
 #+END_SRC
 * Clojure lang for brave!
 #+BEGIN_SRC emacs-lisp
@@ -547,12 +547,11 @@ Which key is a package which shows possible ways to complete the sequence of com
   (use-package flycheck-rust
     :after rust-mode
     :config
-    (with-eval-after-load 'rust-mode
-      (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
   (use-package racer
     :after rust-mode
     :config
-    (setq racer-rust-src-path "/home/i1i1/.rustup/toolchains/nightly-2020-11-24-x86_64-unknown-linux-gnu/lib/rustlib/")
+    (evil-define-key 'normal 'rust-mode (kbd "C-]") #'racer-find-definition)
     (add-hook 'rust-mode-hook #'racer-mode)
     (add-hook 'racer-mode-hook #'eldoc-mode))
   (use-package lsp-ui)

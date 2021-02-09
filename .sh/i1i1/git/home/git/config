@@ -13,8 +13,8 @@
     autoSquash = true
 [alias]
     br = branch
-    ci = commit
-    cia = commit -a --amend --no-edit
+    ci = commit -s
+    cia = commit -sa --amend --no-edit
     cl = clone
     cld = clone --depth=1
     co = checkout

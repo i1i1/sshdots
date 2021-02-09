@@ -21,5 +21,6 @@ export LC_ALL=en_US.utf8
 export TERM=xterm-256color
 export TODO_DIR=$HOME/.config/todotxt
 export XDG_CONFIG_HOME="$HOME/.config"
+export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/library
 
 eval `dircolors $RCFG_DIR/dircolors`
