@@ -35,6 +35,8 @@
 .config/xfce4/
 .config/yandex-cloud
 .config/zoomus.conf
+.config/skypeforlinux
+.config/cef_user_data
 .emacs.d/auto-save-list/
 .emacs.d/config.el
 .emacs.d/custom.el
@@ -44,7 +46,7 @@
 .emacs.d/irony/
 .emacs.d/places
 .emacs.d/projectile-bookmarks.eld
-.emacs.d/.python-environments/
+.emacs.d/.*
 .emacs.d/recentf
 .emacs.d/smex-items
 .emacs.d/tramp

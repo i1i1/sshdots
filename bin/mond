@@ -6,7 +6,7 @@ check_plugged() {
     is_plugged || return
     xrandr --output eDP1 --off
     xrandr --output DP1 --mode 1920x1080
-    xrandr --output DP1 --mode 3520x1980R
+    xrandr --output DP1 --mode 2560x1440 #3520x1980R
     PLUGGED=1
 }
 check_unplugged() { is_plugged || { xrandr --output eDP1 --auto --output DP1 --off; PLUGGED=0; }; }

@@ -77,7 +77,7 @@ Setting default shell inside emacs to Bash
 #+BEGIN_SRC emacs-lisp
   (custom-set-faces
    '(default ((t (:stipple nil
-                           :height 73
+                           :height 73 ; 95
                            :weight normal
                            :width normal
                            :family "Go Mono"
@@ -347,7 +347,7 @@ Which key is a package which shows possible ways to complete the sequence of com
   (use-package company
     :config
     (setq company-idle-delay 0.1)
-    (setq company-minimum-prefix-length 4)
+    (setq company-minimum-prefix-length 6)
     (setq company-tooltip-align-annotations t)
     (global-company-mode))
 
@@ -486,6 +486,30 @@ Which key is a package which shows possible ways to complete the sequence of com
                               ))
   (electric-pair-mode t)
 #+END_SRC
+** 🐓 Coq
+#+BEGIN_SRC emacs-lisp
+  (use-package proof-general)
+  (use-package company-coq)
+#+END_SRC
+** Agda
+#+BEGIN_SRC emacs-lisp
+  ;(use-package agda2-mode)
+
+  (load-file (let ((coding-system-for-read 'utf-8))
+               (shell-command-to-string "agda-mode locate")))
+
+  (defun agda-install-save-hooks ()
+    (add-hook 'before-save-hook #'agda2-load t t))
+
+  (add-hook 'agda2-mode-hook #'agda-install-save-hooks)
+  ;(add-hook 'agda2-mode-hook
+  ;		  '(lambda ()
+              ; If you do not want to use any input method:
+  ;			(deactivate-input-method)
+              ; (In some versions of Emacs you should use
+              ; inactivate-input-method instead of
+              ; deactivate-input-method.)
+#+END_SRC
 * Snippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -542,18 +566,14 @@ Which key is a package which shows possible ways to complete the sequence of com
 * Rust lang
 #+BEGIN_SRC emacs-lisp
   (use-package rust-mode
-    :config
-    (setq rust-format-on-save t))
+	:config
+	(setq rust-format-on-save t))
   (use-package flycheck-rust
-    :after rust-mode
-    :config
-    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-  (use-package racer
-    :after rust-mode
-    :config
-    (evil-define-key 'normal 'rust-mode (kbd "C-]") #'racer-find-definition)
-    (add-hook 'rust-mode-hook #'racer-mode)
-    (add-hook 'racer-mode-hook #'eldoc-mode))
+	:after rust-mode
+	:config
+	(add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+  (setq lsp-rust-server 'rust-analyzer)
+  (setq lsp-rust-analyzer-server-display-inlay-hints t)
   (use-package lsp-ui)
 #+END_SRC
 * Minor issues

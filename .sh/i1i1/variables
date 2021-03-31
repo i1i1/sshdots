@@ -23,4 +23,5 @@ export TODO_DIR=$HOME/.config/todotxt
 export XDG_CONFIG_HOME="$HOME/.config"
 export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/library
 
+eval $(opam env)
 eval `dircolors $RCFG_DIR/dircolors`

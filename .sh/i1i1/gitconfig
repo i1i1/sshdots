@@ -14,6 +14,6 @@
 [diff "git-crypt"]
 	textconv = \"git-crypt\" diff
 [oh-my-zsh]
-	lastVersion = d978f385e52a19f2fd41e8c7ceb2f7c0a4dfc56c
+	lastVersion = 0ab87c26c17171ae6162ff379a0c704fa57dff2e
 [rebase]
 	autoStash = true
